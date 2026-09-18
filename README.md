@@ -19,7 +19,9 @@ A high-performance, mobile-first, offline-capable Progressive Web App (PWA) ches
   - **Victory Mode (vs AI)**: Triumphant fanfare, gold trophy, and full-screen 60fps canvas fireworks when human defeats the computer.
   - **2-Player Local Mode**: Explicitly displays both the victor and the defeated party with color-coded banners (e.g., *"White is Victorious! Black has been defeated"*).
   - **Draw / Stalemate**: Neutral balance scales of justice and peaceful two-tone chime.
-- **Ultra Mobile Ergonomic Layout**: Action buttons (`Undo`, `Redo`, `Flip`, `New Game`) are docked directly below the board for single-thumb reach. Dynamic viewport-aware scaling (`calc(100dvh - 220px)`) guarantees the board, players, and controls fit above the fold with zero scrolling.
+- **Live Real-Time Evaluation Bar**: Sleek liquid glass advantage gauge running alongside the board with sigmoid probability smoothing and numeric score readout (`+0.0`, `+1.8`, `-2.4`, `+M`), reflowing into a horizontal progress bar on mobile.
+- **Neural Synaptic Thinking Indicator**: Real-time 3-node synaptic wave animation that pulses whenever the Python engine evaluates deep positions.
+- **Ultra Mobile Ergonomic Layout**: Action buttons (`Undo`, `Redo`, `Flip`, `New Game`) are docked directly below the board in a floating frosted dock for single-thumb reach. Dynamic viewport-aware scaling (`calc(100dvh - 225px)`) guarantees the board, players, and controls fit above the fold with zero scrolling.
 - **iOS 27 Liquid Glass Aesthetic & Zero Emojis**: High-end vector SVG icons everywhere, frosted backdrop-filter blurs, spec-highlight borders, and responsive touch feedback.
 - **Dual Input Modes**: Seamlessly switch between tap-to-select / tap-to-move and drag-and-drop on any device.
 - **Synthesized Audio Engine**: Procedural sound effects generated natively in-browser via the Web Audio API (move, capture, check, castle, victory fanfare, defeat arpeggio, draw chime).
@@ -67,6 +69,7 @@ npm run lint
 For detailed technical specifications and guides, consult the dedicated documentation in `/docs`:
 
 - **[System Architecture & Design Patterns](docs/ARCHITECTURE.md)**: Component dependency diagrams, engine decoupling rationale, two-tier move pipeline, state lifecycle, and procedural Web Audio synthesis mechanics.
+- **[Python REST API Reference & Endpoints](docs/API_REFERENCE.md)**: Exhaustive documentation of all 6 REST endpoints, request/response JSON schemas, error codes, and curl/fetch integration examples.
 - **[FIDE Rules, Edge Cases & Verification Reference](docs/RULES_AND_EDGE_CASES.md)**: Castling validation invariants, the en passant horizontal rank-pin proof, threefold repetition hashing, and official Perft test results.
 - **[Native Mobile App Conversion Guide](docs/NATIVE_APP_WRAPPER_GUIDE.md)**: Step-by-step Capacitor setup, iOS Xcode configuration, Android Studio APK/AAB signing, and WebView performance rules.
 - **[Contributing Guidelines](docs/CONTRIBUTING.md)**: Development setup, local testing instructions, code style, and test suite requirements.

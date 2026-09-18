@@ -23,7 +23,7 @@ import {
   getPieceSVG
 } from './pieces.js';
 import { moveToSAN, generatePGN, toFEN } from './notation.js';
-import { getAIMove } from './ai.js';
+import { getAIMove, evaluateBoard } from './ai.js';
 import { VictoryCelebration } from './confetti.js';
 
 // Procedural Web Audio Sound Generator
@@ -258,6 +258,11 @@ export class ChessUI {
     this.moveListEl = document.getElementById('move-list');
     this.moveCountLabel = document.getElementById('move-count-label');
 
+    // Real-Time Evaluation Bar
+    this.evalBarContainer = document.getElementById('eval-bar-container');
+    this.evalBarFill = document.getElementById('eval-bar-fill');
+    this.evalScoreText = document.getElementById('eval-score-text');
+
     // Player bars
     this.topPlayerAvatar = document.getElementById('top-player-avatar');
     this.topPlayerName = document.getElementById('top-player-name');
@@ -323,6 +328,7 @@ export class ChessUI {
     this._initSoundUI();
     this._bindControls();
     this._bindBoardEvents();
+    window.addEventListener('resize', () => this.updateEvalBar());
     this.render();
   }
 
@@ -951,6 +957,7 @@ export class ChessUI {
     this.renderPlayerBars();
     this.renderHistory();
     this.renderStatus();
+    this.updateEvalBar();
   }
 
   renderBoard() {
@@ -1144,5 +1151,48 @@ export class ChessUI {
     const status = this.game.getGameStatus();
     this.statusTitleEl.textContent = status.title;
     this.statusDescEl.textContent = status.description;
+  }
+
+  updateEvalBar(customScore = null) {
+    if (!this.evalBarFill || !this.evalScoreText) return;
+
+    let score = customScore;
+    if (score === null || score === undefined) {
+      if (this.game.isCheckmate()) {
+        score = this.game.turn === WHITE ? -99999 : 99999;
+      } else if (this.game.isGameOver()) {
+        score = 0;
+      } else {
+        score = evaluateBoard(this.game.board);
+      }
+    }
+
+    let whitePercent;
+    let scoreDisplay;
+
+    if (Math.abs(score) > 90000) {
+      const isWhiteWinning = score > 0;
+      whitePercent = isWhiteWinning ? 100 : 0;
+      scoreDisplay = isWhiteWinning ? '+M' : '-M';
+    } else {
+      // Sigmoid winning probability formula
+      const winProbability = 1 / (1 + Math.exp(-0.004 * score));
+      whitePercent = Math.max(5, Math.min(95, Math.round(winProbability * 100)));
+      const pawns = (score / 100).toFixed(1);
+      scoreDisplay = score > 0 ? `+${pawns}` : `${pawns}`;
+    }
+
+    // Adjust for flipped perspective
+    const visualPercent = this.flipped ? (100 - whitePercent) : whitePercent;
+
+    if (window.innerWidth < 768) {
+      this.evalBarFill.style.width = `${visualPercent}%`;
+      this.evalBarFill.style.height = '100%';
+    } else {
+      this.evalBarFill.style.height = `${visualPercent}%`;
+      this.evalBarFill.style.width = '100%';
+    }
+
+    this.evalScoreText.textContent = scoreDisplay;
   }
 }

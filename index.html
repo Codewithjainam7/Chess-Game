@@ -93,10 +93,21 @@
           </div>
         </div>
 
-        <!-- Board Grid Wrapper -->
-        <div class="board-wrapper" id="board-wrapper">
-          <div id="chess-board" class="chess-board" role="grid" aria-label="Interactive chess board">
-            <!-- 64 squares rendered dynamically by ui.js -->
+        <!-- Board Area with Real-Time Evaluation Bar -->
+        <div class="board-area-wrapper" id="board-area-wrapper">
+          <!-- Live Position Evaluation Bar -->
+          <div class="eval-bar-container" id="eval-bar-container" title="Position Evaluation" aria-label="Real-time position evaluation">
+            <div class="eval-bar-fill" id="eval-bar-fill" style="height: 50%;"></div>
+            <div class="eval-score-wrap">
+              <span class="eval-score-text" id="eval-score-text">0.0</span>
+            </div>
+          </div>
+
+          <!-- Board Grid Wrapper -->
+          <div class="board-wrapper" id="board-wrapper">
+            <div id="chess-board" class="chess-board" role="grid" aria-label="Interactive chess board">
+              <!-- 64 squares rendered dynamically by ui.js -->
+            </div>
           </div>
         </div>
 
@@ -143,8 +154,12 @@
             <div id="status-desc" class="status-subtext">Game in progress</div>
           </div>
           <div id="ai-thinking-badge" class="ai-thinking-badge" style="display: none;">
-            <span class="ai-pulse"></span>
-            <span>Thinking...</span>
+            <div class="synapse-cluster" aria-hidden="true">
+              <span class="synapse-dot dot-1"></span>
+              <span class="synapse-dot dot-2"></span>
+              <span class="synapse-dot dot-3"></span>
+            </div>
+            <span class="thinking-text">AI Thinking...</span>
           </div>
         </div>
 

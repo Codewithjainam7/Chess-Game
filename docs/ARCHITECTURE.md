@@ -6,10 +6,11 @@ This document details the architectural principles, component interactions, algo
 
 ## 1. Architectural Philosophy
 
-The application follows three fundamental tenets:
-1. **Engine Independence**: The rules engine (`board.js`, `pieces.js`, `moveGenerator.js`, `zobrist.js`, `notation.js`, `gameState.js`) contains **zero dependencies on the DOM**, Web APIs, or window objects. It runs natively in Node.js for CLI testing, in Web Workers, or in any JS runtime.
+The application follows four fundamental tenets:
+1. **Hybrid Client-Server Engine Decoupling**: The game operates as a unified Python-powered web application on port `5173`. When connected to the Python backend, the client utilizes an industrial-grade engine backed by `python-chess` with Negamax search, Alpha-Beta pruning, Piece-Square Tables (PST), and Quiescence search. If offline, the client seamlessly falls back to an embedded vanilla JavaScript engine with zero disruption.
 2. **Zero Framework Overhead**: No React, Vue, or build-step bundlers. Using native ES modules allows instantaneous page loads, zero compilation delay during development, and trivial static file hosting.
 3. **App-Conversion Ready**: The presentation layer avoids legacy browser assumptions (e.g. `window.open`, browser history API hacks, or fixed desktop pixel heights), enabling direct wrapping into Capacitor, Cordova, or Tauri with zero modifications.
+4. **iOS 27 Liquid Glass Aesthetic**: A state-of-the-art visual design language utilizing heavy backdrop refractions, dynamic ambient light orbs, specular crystal bezels, and 100% scalable vector SVGs without any emojis.
 
 ---
 
@@ -17,9 +18,13 @@ The application follows three fundamental tenets:
 
 ```mermaid
 graph TD
-    UI[ui.js - DOM, Input, Audio, Modals] --> GameState[gameState.js - Turn & History Manager]
+    UI[ui.js - DOM, Input, Audio, Modals, Eval Bar] --> PyAPI[REST API - /api/ai-move]
+    UI --> GameState[gameState.js - Turn & History Manager]
     Main[main.js - Bootstrap & Service Worker] --> GameState
     Main --> UI
+    PyAPI --> Flask[Flask App - backend/app.py]
+    Flask --> PyService[Game Service - backend/game_service.py]
+    PyService --> PyEngine[Chess Engine - backend/chess_engine.py]
     GameState --> MoveGen[moveGenerator.js - Move Gen & King Safety]
     GameState --> Zobrist[zobrist.js - 64-bit Position Hashing]
     GameState --> Notation[notation.js - FEN & SAN Formatter]
@@ -165,3 +170,65 @@ Upon checkmate or resignation, the UI triggers a multi-phase celebration:
 4. **Hardware Adaptation**: Canvas automatically scales with `window.devicePixelRatio` (capped at 2.0 for mobile thermal safety). Particle densities adapt dynamically (90 particles on mobile vs 160 on desktop).
 5. **Harmonic Fanfare**: Procedural Web Audio brass fanfare arpeggio (`C4 -> E4 -> G4 -> C5`) supported by a sustained major third shimmer chord.
 6. **Battery & Memory Safe**: Event loop terminates cleanly after the 4-second cascade or immediately upon dialog dismissal, releasing memory and frame requests.
+
+---
+
+## 8. Python Backend & Flask REST Engine (`backend/`)
+
+The Python backend microservice powers the game's core calculations and provides an industrial-grade chess engine running on port `5173`:
+
+- **Flask Microservice (`backend/app.py`)**:
+  - Serves static assets (`index.html`, stylesheets, scripts, manifest, vector icons) and handles JSON API traffic.
+  - Multi-threaded execution (`threaded=True`) ensures concurrent search tasks do not block static file delivery or UI responsiveness.
+- **Python Chess AI Engine (`backend/chess_engine.py`)**:
+  - Leverages standard `python-chess` for FIDE-compliant move generation and board state representations.
+  - Combines Negamax search with Alpha-Beta pruning, MVV-LVA move ordering, and Quiescence search on tactical capture sequences.
+  - Piece-Square Tables (PST) evaluate center control, piece activity, and king safety in real time.
+- **Game Service (`backend/game_service.py`)**:
+  - Handles FEN parsing, legal move generation, move application, in-check checks, termination rules, and PGN export formatting.
+- **Detailed Endpoints**: Refer to [docs/API_REFERENCE.md](API_REFERENCE.md) for full endpoint specifications, request/response schemas, and example payloads.
+
+---
+
+## 9. Real-Time Position Evaluation Bar (`updateEvalBar`)
+
+The interface includes a real-time live evaluation bar that dynamically visualizes the game balance:
+1. **Centipawn Evaluation**: Calculates board advantage from White's perspective using piece values and positional tables.
+2. **Sigmoid Win Probability Mapping**:
+   $$\text{winProbability} = \frac{1}{1 + e^{-0.004 \times \text{score}}}$$
+   - Maps raw centipawns to a clean percentage ($5\%$ to $95\%$).
+   - Scores $> \pm 90,000$ (forced checkmate) pin the bar to $100\%$ or $0\%$ and display $+M$ / $-M$.
+3. **Responsive Adaptation**:
+   - **Desktop (>= 768px)**: Renders as a vertical liquid glass capsule running the full height of the chessboard with glowing numeric pill.
+   - **Mobile (< 768px)**: Smoothly reflows into a sleek horizontal progress bar directly above the board to preserve 100% of the screen width for touch squares.
+
+---
+
+## 10. Multi-Scenario Outcome & Soundscape System
+
+The game over system intelligently determines player roles and presents dedicated visuals and audio:
+
+1. **Human vs AI — Defeat**:
+   - Renders a somber dark obsidian modal (`.defeat-card`).
+   - Rains falling crimson and charcoal ember particles (`startDefeat()`).
+   - Displays a shattered knight sword combat emblem (`.defeat-svg-vector`).
+   - Synthesizes a descending minor arpeggio chime (`G3 -> Eb3 -> C3 -> G2`).
+2. **Human vs AI — Victory**:
+   - Renders an emerald/gold victory card (`.victory-card`).
+   - Explodes 60fps canvas fireworks and celebratory confetti ribbons (`startVictory()`).
+   - Displays a sculpted luxury gold trophy vector SVG.
+   - Plays a triumphant brass fanfare arpeggio (`C4 -> E4 -> G4 -> C5`).
+3. **2-Player Local Mode**:
+   - Explicitly displays the victor and defeated party with distinct color badges (e.g. *"White is Victorious! Black has been defeated"*).
+4. **Draw & Stalemate**:
+   - Displays a neutral slate card (`.draw-card`) with scales of justice and peaceful two-tone chime (`A3 -> D4`).
+
+---
+
+## 11. iOS 27 Liquid Glass Design System
+
+The visual language follows the futuristic **iOS 27 Liquid Glass** design system:
+- **Vitreous Refraction**: Surfaces use `backdrop-filter: blur(26px) saturate(210%)` over organic drifting liquid ambient lighting orbs.
+- **Crystal Specular Sheens**: Borders and buttons feature multi-tier inner specular glares (`inset 0 1px 1px rgba(255, 255, 255, 0.45)`).
+- **Apple Spring Micro-Animations**: Interactive buttons utilize Apple's signature spring curve `cubic-bezier(0.16, 1, 0.3, 1)` with press feedback and rotational icon animations.
+- **Zero Emojis**: 100% vector SVG icons sculpted specifically for tournament aesthetics.

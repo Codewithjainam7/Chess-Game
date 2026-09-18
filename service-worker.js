@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chess-game-v8-python-backend';
+const CACHE_NAME = 'chess-game-v9-eval-bar-design';
 const PRECACHE_ASSETS = [
   './',
   './index.html',

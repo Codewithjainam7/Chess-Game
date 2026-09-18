@@ -525,9 +525,67 @@ html, body {
 }
 
 /* ==========================================================================
-   Liquid Vitreous Chess Board
+   Liquid Vitreous Chess Board & Real-Time Eval Gauge
    Sculpted floating crystal slab with specular refraction
    ========================================================================== */
+.board-area-wrapper {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Evaluation Bar Container */
+.eval-bar-container {
+  position: relative;
+  width: 22px;
+  border-radius: var(--border-radius-pill);
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid var(--glass-border);
+  box-shadow: var(--glass-card-shadow), var(--glass-specular);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  flex-shrink: 0;
+  transition: all var(--transition-normal);
+}
+
+[data-theme="light"] .eval-bar-container {
+  background: rgba(226, 232, 240, 0.8);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.eval-bar-fill {
+  width: 100%;
+  background: linear-gradient(180deg, #ffffff 0%, #e0e7ff 45%, #38bdf8 100%);
+  border-radius: var(--border-radius-pill) var(--border-radius-pill) 0 0;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
+  transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1), width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.eval-score-wrap {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.eval-score-text {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Plus Jakarta Sans", monospace, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #38bdf8;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+}
+
 .board-wrapper {
   position: relative;
   width: 100%;
@@ -540,6 +598,33 @@ html, body {
   -webkit-backdrop-filter: var(--glass-blur);
   touch-action: none;
   transition: all var(--transition-normal);
+}
+
+.board-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: calc(var(--border-radius-lg) - 2px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  z-index: 10;
+}
+
+.board-wrapper::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.02) 35%,
+    transparent 55%
+  );
+  pointer-events: none;
+  z-index: 11;
 }
 
 .chess-board {
@@ -752,29 +837,59 @@ html, body {
 .ai-thinking-badge {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 0.82rem;
   font-weight: 800;
   color: #38bdf8;
-  background: rgba(56, 189, 248, 0.15);
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  padding: 5px 12px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  padding: 5px 14px;
   border-radius: var(--border-radius-pill);
-  box-shadow: 0 0 14px rgba(56, 189, 248, 0.3);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.3), var(--glass-specular);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.ai-pulse {
-  width: 8px;
-  height: 8px;
+.synapse-cluster {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.synapse-dot {
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: #38bdf8;
-  box-shadow: 0 0 10px #38bdf8;
-  animation: pulse 1s infinite alternate ease-in-out;
+  box-shadow: 0 0 8px #38bdf8;
+  animation: synapseWave 1.4s infinite ease-in-out;
 }
 
-@keyframes pulse {
-  0% { transform: scale(0.7); opacity: 0.5; }
-  100% { transform: scale(1.3); opacity: 1; }
+.synapse-dot.dot-1 { animation-delay: 0s; }
+.synapse-dot.dot-2 { animation-delay: 0.22s; }
+.synapse-dot.dot-3 { animation-delay: 0.44s; }
+
+@keyframes synapseWave {
+  0%, 100% {
+    transform: scale(0.7);
+    opacity: 0.35;
+    background: #38bdf8;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 1;
+    background: #ffffff;
+    box-shadow: 0 0 10px #38bdf8, 0 0 18px rgba(99, 102, 241, 0.8);
+  }
+}
+
+.thinking-text {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  background: linear-gradient(135deg, #ffffff 0%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Game Mode & AI Settings Card */
@@ -975,14 +1090,25 @@ html, body {
 }
 
 /* ==========================================================================
-   Liquid Glass Action Buttons
+   Liquid Glass Floating Action Dock
    ========================================================================== */
 .action-controls {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 12px;
+  padding: 6px 8px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-pill);
+  box-shadow: var(--glass-card-shadow), var(--glass-specular);
+}
+
+[data-theme="light"] .action-controls {
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .btn {
@@ -991,7 +1117,7 @@ html, body {
   justify-content: center;
   gap: 6px;
   min-height: var(--min-touch-target);
-  padding: 10px 14px;
+  padding: 9px 14px;
   border: 1px solid var(--glass-border);
   border-radius: var(--border-radius-md);
   background: var(--glass-surface);
@@ -1006,6 +1132,21 @@ html, body {
   transition: all var(--transition-fast);
 }
 
+.action-controls .btn {
+  border-radius: var(--border-radius-pill);
+  border: 1px solid transparent;
+  background: transparent;
+  box-shadow: none;
+  padding: 8px 10px;
+}
+
+.action-controls .btn:hover {
+  background: var(--glass-surface-hover);
+  border-color: var(--glass-border-bright);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), var(--glass-specular);
+  transform: translateY(-2px);
+}
+
 .btn:hover {
   background: var(--glass-surface-hover);
   border-color: var(--glass-border-bright);
@@ -1014,7 +1155,7 @@ html, body {
 }
 
 .btn:active {
-  transform: scale(0.95);
+  transform: scale(0.94);
   background: var(--glass-surface-active);
 }
 
@@ -1030,6 +1171,19 @@ html, body {
   stroke: currentColor;
   stroke-width: 2.2;
   fill: none;
+  transition: transform 260ms var(--ios-spring-bouncy);
+}
+
+#btn-undo:hover svg {
+  transform: rotate(-25deg);
+}
+
+#btn-redo:hover svg {
+  transform: rotate(25deg);
+}
+
+#btn-flip:hover svg {
+  transform: rotate(180deg);
 }
 
 /* Primary Liquid Neon Button (New Game) */

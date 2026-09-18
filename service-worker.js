@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chess-game-v4';
+const CACHE_NAME = 'chess-game-v5';
 const PRECACHE_ASSETS = [
   './',
   './index.html',

@@ -869,13 +869,13 @@ export class ChessUI {
 
     // Top player bar
     this.topPlayerAvatar.className = `player-avatar ${topColor === WHITE ? 'white' : 'black'}`;
-    this.topPlayerAvatar.textContent = topColor === WHITE ? 'W' : 'B';
+    this.topPlayerAvatar.textContent = topColor === WHITE ? '♔' : '♚';
     this.topPlayerName.textContent = topName;
     this.topTurnPill.className = `turn-pill ${this.game.turn === topColor && !this.game.isGameOver() ? 'active' : ''}`;
 
     // Bottom player bar
     this.bottomPlayerAvatar.className = `player-avatar ${bottomColor === WHITE ? 'white' : 'black'}`;
-    this.bottomPlayerAvatar.textContent = bottomColor === WHITE ? 'W' : 'B';
+    this.bottomPlayerAvatar.textContent = bottomColor === WHITE ? '♔' : '♚';
     this.bottomPlayerName.textContent = bottomName;
     this.bottomTurnPill.className = `turn-pill ${this.game.turn === bottomColor && !this.game.isGameOver() ? 'active' : ''}`;
 

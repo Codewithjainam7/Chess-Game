@@ -64,98 +64,219 @@ export function getOppositeColor(color) {
 }
 
 /**
- * Standard, crisp vector paths for all 12 chess pieces (Staunton style).
- * Rendered using inline SVGs for resolution-independent scaling.
+ * High-End Luxury Chess Pieces.
+ * Rendered using precision SVG vectors with gradients, subtle specular highlights,
+ * gold-embellished diadems, and chiseled silhouettes.
  */
-const SVG_PATHS = {
-  // White Pieces
-  'w_k': `
-    <path d="M22.5 11.63V6M20 8h5" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5" fill="#f8fafc" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V23c-2.5-7.5-12-10.5-16-4-3 6 6 10.5 6 10.5v7z" fill="#f8fafc" stroke="#1e293b" stroke-width="1.5"/>
-    <path d="M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0" fill="none" stroke="#1e293b" stroke-width="1.5"/>
+const DEFS_CACHE = {
+  w: `
+    <defs>
+      <linearGradient id="w-body-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="40%" stop-color="#f8fafc"/>
+        <stop offset="85%" stop-color="#e2e8f0"/>
+        <stop offset="100%" stop-color="#cbd5e1"/>
+      </linearGradient>
+      <linearGradient id="w-specular" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.1"/>
+      </linearGradient>
+      <linearGradient id="gold-jewel" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fef08a"/>
+        <stop offset="50%" stop-color="#f59e0b"/>
+        <stop offset="100%" stop-color="#b45309"/>
+      </linearGradient>
+      <filter id="piece-shadow" x="-10%" y="-10%" width="130%" height="130%">
+        <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.25"/>
+      </filter>
+    </defs>
   `,
-  'w_q': `
-    <path d="M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11-6-15-5 15-7-11 2 12" fill="#f8fafc" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 2-1 .5-2.5 0 0 0-1.5-1.5-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z" fill="#f8fafc" stroke="#1e293b" stroke-width="1.5"/>
-    <path d="M11.5 30c3.5-1 18.5-1 22 0m-21.5 3.5c3.5-1 17.5-1 21 0m-20 3.5c3.5-1 15.5-1 19 0" fill="none" stroke="#1e293b" stroke-width="1.5"/>
-    <circle cx="6" cy="12" r="2" fill="#f8fafc" stroke="#1e293b" stroke-width="1.5"/>
-    <circle cx="14" cy="9" r="2" fill="#f8fafc" stroke="#1e293b" stroke-width="1.5"/>
-    <circle cx="22.5" cy="8" r="2" fill="#f8fafc" stroke="#1e293b" stroke-width="1.5"/>
-    <circle cx="31" cy="9" r="2" fill="#f8fafc" stroke="#1e293b" stroke-width="1.5"/>
-    <circle cx="39" cy="12" r="2" fill="#f8fafc" stroke="#1e293b" stroke-width="1.5"/>
-  `,
-  'w_r': `
-    <path d="M9 39h27v-3H9v3zm3-3v-4.5h21V36H12zm1-4.5h19l-1.5-15h-16L13 31.5zM11 14h23l2-6H9l2 6z" fill="#f8fafc" stroke="#1e293b" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M12 11.5h4v3h-4v-3zm6.5 0h4v3h-4v-3zm6.5 0h4v3h-4v-3z" fill="#1e293b"/>
-    <path d="M14 29.5c5-1 12-1 17 0m-16-4c4-.8 10-.8 15 0" fill="none" stroke="#1e293b" stroke-width="1.5"/>
-  `,
-  'w_b': `
-    <g fill="#f8fafc" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.35.49-2.32.47-3-.5 1.35-1.94 3-2 3-2z"/>
-      <path d="M15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2z"/>
-      <path d="M25 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 1 1 5 0z"/>
-    </g>
-    <path d="M17.5 26h10M15 30h15m-7.5-14.5v5m-3-2.5h6" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round"/>
-  `,
-  'w_n': `
-    <path d="M22 10c10.5 1 16.5 8 16 29H15c0-9 10-6.5 8-21" fill="#f8fafc" stroke="#1e293b" stroke-width="1.5"/>
-    <path d="M24 18c.38 2.91-5.55 7.37-8 9-3 2-2.82 4.34-5 4-1.042-.94 1.41-4.04 2-5 1.57-2.55 3.15-5.91 3-9 0-4-3-4-3-4s6.24-2.51 11 1z" fill="#f8fafc" stroke="#1e293b" stroke-width="1.5"/>
-    <path d="M9.5 25.5a.5.5 0 1 1-1 0 .5.5 0 1 1 1 0" fill="#1e293b" stroke="#1e293b" stroke-width="1.5"/>
-    <path d="M15 15.5a.5.5 0 1 1-1 0 .5.5 0 1 1 1 0" fill="#1e293b" stroke="#1e293b" stroke-width="1.5"/>
-    <path d="M24.55 10.4s2.25 1.7 1.8 4.2M29.5 13s2.1 1.9 1.5 4.6M34 16.5s1.8 2 1 4.5" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round"/>
-  `,
-  'w_p': `
-    <path d="M22 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38-1.95 1.12-3.28 3.21-3.28 5.62 0 2.03.93 3.84 2.38 5.03-3.15 1.63-5.38 4.9-5.38 8.72V36h21v-1.25c0-3.82-2.23-7.09-5.38-8.72 1.45-1.19 2.38-3 2.38-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#f8fafc" stroke="#1e293b" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M14 36c4.5-1 11.5-1 16 0m-14-4c3.5-.8 9.5-.8 13 0" fill="none" stroke="#1e293b" stroke-width="1.5"/>
-  `,
-
-  // Black Pieces
-  'b_k': `
-    <path d="M22.5 11.63V6M20 8h5" stroke="#f8fafc" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5" fill="#1e293b" stroke="#0f172a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V23c-2.5-7.5-12-10.5-16-4-3 6 6 10.5 6 10.5v7z" fill="#1e293b" stroke="#0f172a" stroke-width="1.5"/>
-    <path d="M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
-    <circle cx="22.5" cy="21" r="1.5" fill="#cbd5e1"/>
-  `,
-  'b_q': `
-    <path d="M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11-6-15-5 15-7-11 2 12" fill="#1e293b" stroke="#0f172a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 2-1 .5-2.5 0 0 0-1.5-1.5-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z" fill="#1e293b" stroke="#0f172a" stroke-width="1.5"/>
-    <path d="M11.5 30c3.5-1 18.5-1 22 0m-21.5 3.5c3.5-1 17.5-1 21 0m-20 3.5c3.5-1 15.5-1 19 0" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
-    <circle cx="6" cy="12" r="2" fill="#1e293b" stroke="#f8fafc" stroke-width="1"/>
-    <circle cx="14" cy="9" r="2" fill="#1e293b" stroke="#f8fafc" stroke-width="1"/>
-    <circle cx="22.5" cy="8" r="2" fill="#1e293b" stroke="#f8fafc" stroke-width="1"/>
-    <circle cx="31" cy="9" r="2" fill="#1e293b" stroke="#f8fafc" stroke-width="1"/>
-    <circle cx="39" cy="12" r="2" fill="#1e293b" stroke="#f8fafc" stroke-width="1"/>
-  `,
-  'b_r': `
-    <path d="M9 39h27v-3H9v3zm3-3v-4.5h21V36H12zm1-4.5h19l-1.5-15h-16L13 31.5zM11 14h23l2-6H9l2 6z" fill="#1e293b" stroke="#0f172a" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M12 11.5h4v3h-4v-3zm6.5 0h4v3h-4v-3zm6.5 0h4v3h-4v-3z" fill="#cbd5e1"/>
-    <path d="M14 29.5c5-1 12-1 17 0m-16-4c4-.8 10-.8 15 0" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
-  `,
-  'b_b': `
-    <g fill="#1e293b" stroke="#0f172a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.35.49-2.32.47-3-.5 1.35-1.94 3-2 3-2z"/>
-      <path d="M15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2z"/>
-      <path d="M25 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 1 1 5 0z"/>
-    </g>
-    <path d="M17.5 26h10M15 30h15m-7.5-14.5v5m-3-2.5h6" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
-  `,
-  'b_n': `
-    <path d="M22 10c10.5 1 16.5 8 16 29H15c0-9 10-6.5 8-21" fill="#1e293b" stroke="#0f172a" stroke-width="1.5"/>
-    <path d="M24 18c.38 2.91-5.55 7.37-8 9-3 2-2.82 4.34-5 4-1.042-.94 1.41-4.04 2-5 1.57-2.55 3.15-5.91 3-9 0-4-3-4-3-4s6.24-2.51 11 1z" fill="#1e293b" stroke="#0f172a" stroke-width="1.5"/>
-    <circle cx="9.5" cy="25.5" r="1" fill="#f8fafc"/>
-    <circle cx="15" cy="15.5" r="1" fill="#f8fafc"/>
-    <path d="M24.55 10.4s2.25 1.7 1.8 4.2M29.5 13s2.1 1.9 1.5 4.6M34 16.5s1.8 2 1 4.5" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
-  `,
-  'b_p': `
-    <path d="M22 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38-1.95 1.12-3.28 3.21-3.28 5.62 0 2.03.93 3.84 2.38 5.03-3.15 1.63-5.38 4.9-5.38 8.72V36h21v-1.25c0-3.82-2.23-7.09-5.38-8.72 1.45-1.19 2.38-3 2.38-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#1e293b" stroke="#0f172a" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M14 36c4.5-1 11.5-1 16 0m-14-4c3.5-.8 9.5-.8 13 0" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
+  b: `
+    <defs>
+      <linearGradient id="b-body-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#475569"/>
+        <stop offset="35%" stop-color="#334155"/>
+        <stop offset="75%" stop-color="#1e293b"/>
+        <stop offset="100%" stop-color="#0f172a"/>
+      </linearGradient>
+      <linearGradient id="b-rim-glow" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#94a3b8" stop-opacity="0.6"/>
+        <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.2"/>
+      </linearGradient>
+      <linearGradient id="gold-jewel-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fef08a"/>
+        <stop offset="60%" stop-color="#f59e0b"/>
+        <stop offset="100%" stop-color="#78350f"/>
+      </linearGradient>
+      <filter id="piece-shadow-dark" x="-10%" y="-10%" width="130%" height="130%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.45"/>
+      </filter>
+    </defs>
   `
 };
 
-export function getPieceSVG(type, color) {
-  const key = `${color}_${type.toLowerCase()}`;
-  const path = SVG_PATHS[key] || '';
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" width="100%" height="100%" class="chess-piece" data-piece="${key}">${path}</svg>`;
+/**
+ * High-End SVG Vector Geometry for all 6 piece types.
+ * Masterfully sculpted on a 100x100 canvas.
+ */
+function renderPieceGraphics(type, color) {
+  const isW = color === WHITE;
+  const bodyGrad = isW ? 'url(#w-body-grad)' : 'url(#b-body-grad)';
+  const strokeColor = isW ? '#1e293b' : '#020617';
+  const rimStroke = isW ? 'rgba(255, 255, 255, 0.7)' : 'rgba(148, 163, 184, 0.45)';
+  const goldFill = isW ? 'url(#gold-jewel)' : 'url(#gold-jewel-dark)';
+  const filter = isW ? 'url(#piece-shadow)' : 'url(#piece-shadow-dark)';
+  const strokeW = '2.4';
+
+  switch (type) {
+    case PAWN:
+      return `
+        <g filter="${filter}">
+          <!-- Base plinth -->
+          <path d="M22 88 h56 c-1 -4 -5 -7 -10 -7 H32 c-5 0 -9 3 -10 7 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Lower ring -->
+          <path d="M28 81 h44 c-1 -3 -3 -4 -6 -4 H34 c-3 0 -5 1 -6 4 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}"/>
+          <!-- Stem torso -->
+          <path d="M34 77 c2 -14 7 -22 11 -28 h10 c4 6 9 14 11 28 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Neck collar -->
+          <path d="M37 49 h26 c0 -3 -2 -5 -5 -5 H42 c-3 0 -5 2 -5 5 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}"/>
+          <!-- Head Sphere -->
+          <circle cx="50" cy="27" r="14.5" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}"/>
+          <!-- Specular Light Sheen -->
+          <path d="M43 18 a 9 9 0 0 1 12 0" fill="none" stroke="${rimStroke}" stroke-width="2.2" stroke-linecap="round"/>
+        </g>
+      `;
+
+    case KNIGHT:
+      return `
+        <g filter="${filter}">
+          <!-- Base plinth -->
+          <path d="M20 88 h60 c-1 -4 -5 -7 -10 -7 H30 c-5 0 -9 3 -10 7 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Lower ring -->
+          <path d="M25 81 h50 c-1 -3 -4 -4 -7 -4 H32 c-3 0 -6 1 -7 4 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}"/>
+          <!-- Main Stallion Body & Mane Silhouette -->
+          <path d="M25 77 C28 62 30 52 35 48 C30 46 25 43 23 37 C21 32 23 27 28 25 C33 23 40 25 46 22 C49 20 53 14 55 10 C57 16 57 20 62 20 C64 16 66 12 69 11 C70 17 68 22 75 28 C79 32 80 40 76 49 C80 54 80 62 76 68 C74 72 73 75 75 77 Z"
+            fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Chiseled Cheek & Jaw contour -->
+          <path d="M35 48 C38 46 45 42 47 34 C49 27 46 23 42 24" fill="none" stroke="${strokeColor}" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- Flowing Mane Grooves -->
+          <path d="M62 26 C68 31 72 38 71 44" fill="none" stroke="${strokeColor}" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M67 43 C72 48 74 56 71 63" fill="none" stroke="${strokeColor}" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M69 61 C72 66 73 72 70 77" fill="none" stroke="${strokeColor}" stroke-width="1.6" stroke-linecap="round"/>
+          <!-- Muzzle & Nostril -->
+          <path d="M24 33 C26 35 29 35 30 33" fill="none" stroke="${strokeColor}" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- Expressive Almond Eye with Gold Glint -->
+          <ellipse cx="37" cy="27" rx="3" ry="2.2" transform="rotate(-15 37 27)" fill="${strokeColor}"/>
+          <circle cx="36" cy="26" r="1.2" fill="${goldFill}"/>
+          <!-- Chest Highlight Arc -->
+          <path d="M29 65 C32 54 36 49 40 44" fill="none" stroke="${rimStroke}" stroke-width="2" stroke-linecap="round"/>
+        </g>
+      `;
+
+    case BISHOP:
+      return `
+        <g filter="${filter}">
+          <!-- Base plinth -->
+          <path d="M20 88 h60 c-1 -4 -5 -7 -10 -7 H30 c-5 0 -9 3 -10 7 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Lower ring -->
+          <path d="M25 81 h50 c-1 -3 -4 -4 -7 -4 H32 c-3 0 -6 1 -7 4 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}"/>
+          <!-- Waist stem -->
+          <path d="M34 77 c1 -10 4 -16 8 -21 h16 c4 5 7 11 8 21 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Mid collar ring -->
+          <path d="M33 56 h34 c0 -3 -3 -5 -6 -5 H39 c-3 0 -6 2 -6 5 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}"/>
+          <!-- Mitre Hat Arch -->
+          <path d="M50 14 C35 25 30 38 33 51 C38 54 62 54 67 51 C70 38 65 25 50 14 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Mitre Incision Slot -->
+          <path d="M55 24 L42 41" fill="none" stroke="${strokeColor}" stroke-width="2.6" stroke-linecap="round"/>
+          <!-- Golden Apex Cross & Orb -->
+          <circle cx="50" cy="12" r="4.2" fill="${goldFill}" stroke="${strokeColor}" stroke-width="1.6"/>
+          <path d="M50 5 v4 M48 7 h4" stroke="${goldFill}" stroke-width="2" stroke-linecap="round"/>
+          <!-- Highlights -->
+          <path d="M37 28 C34 35 34 43 37 48" fill="none" stroke="${rimStroke}" stroke-width="2" stroke-linecap="round"/>
+        </g>
+      `;
+
+    case ROOK:
+      return `
+        <g filter="${filter}">
+          <!-- Base plinth -->
+          <path d="M18 88 h64 c-1 -4 -6 -7 -11 -7 H29 c-5 0 -10 3 -11 7 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Lower molding -->
+          <path d="M23 81 h54 c-1 -3 -3 -4 -6 -4 H29 c-3 0 -5 1 -6 4 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}"/>
+          <!-- Fortress Wall Stem -->
+          <path d="M29 77 L32 38 h36 L71 77 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Cornice machicolation ledge -->
+          <path d="M22 38 h56 v-6 H22 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- 4 Sturdy Battlements (Crenels & Embrasures) -->
+          <path d="M23 32 v-12 h10 v6 h7 v-6 h10 v6 h7 v-6 h10 v12 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Masonry Arrow-Slit Window -->
+          <path d="M48 48 h4 v14 h-4 Z" fill="${strokeColor}" stroke="${strokeColor}" stroke-width="1.2" stroke-linejoin="round"/>
+          <circle cx="50" cy="46" r="2" fill="${strokeColor}"/>
+          <!-- Wall Highlight -->
+          <path d="M34 44 L32 72" fill="none" stroke="${rimStroke}" stroke-width="2" stroke-linecap="round"/>
+        </g>
+      `;
+
+    case QUEEN:
+      return `
+        <g filter="${filter}">
+          <!-- Base plinth -->
+          <path d="M18 88 h64 c-1 -4 -6 -7 -11 -7 H29 c-5 0 -10 3 -11 7 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Lower ring -->
+          <path d="M23 81 h54 c-1 -3 -4 -4 -7 -4 H30 c-3 0 -6 1 -7 4 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}"/>
+          <!-- Flowing Royal Gown -->
+          <path d="M30 77 C33 66 38 56 40 50 h20 C62 56 67 66 70 77 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Royal Corset Sash -->
+          <path d="M37 50 h26 v-6 H37 Z" fill="${goldFill}" stroke="${strokeColor}" stroke-width="1.5"/>
+          <!-- Upper Bodice & Neckline -->
+          <path d="M37 44 C33 38 29 36 27 34 C36 38 64 38 73 34 C71 36 67 38 63 44 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}"/>
+          <!-- Majestic 5-Point Coronet -->
+          <path d="M24 34 L18 19 L32 29 L50 14 L68 29 L82 19 L76 34 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- 5 Golden Crown Diadem Pearls -->
+          <circle cx="18" cy="18" r="3.2" fill="${goldFill}" stroke="${strokeColor}" stroke-width="1.4"/>
+          <circle cx="32" cy="27" r="3" fill="${goldFill}" stroke="${strokeColor}" stroke-width="1.4"/>
+          <circle cx="50" cy="13" r="4.2" fill="${goldFill}" stroke="${strokeColor}" stroke-width="1.5"/>
+          <circle cx="68" cy="27" r="3" fill="${goldFill}" stroke="${strokeColor}" stroke-width="1.4"/>
+          <circle cx="82" cy="18" r="3.2" fill="${goldFill}" stroke="${strokeColor}" stroke-width="1.4"/>
+          <!-- Royal Gown Highlight -->
+          <path d="M36 74 C38 64 42 56 43 51" fill="none" stroke="${rimStroke}" stroke-width="2.2" stroke-linecap="round"/>
+        </g>
+      `;
+
+    case KING:
+      return `
+        <g filter="${filter}">
+          <!-- Base plinth -->
+          <path d="M18 88 h64 c-1 -4 -6 -7 -11 -7 H29 c-5 0 -10 3 -11 7 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Lower ring -->
+          <path d="M23 81 h54 c-1 -3 -4 -4 -7 -4 H30 c-3 0 -6 1 -7 4 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}"/>
+          <!-- Stately Mantle Body -->
+          <path d="M29 77 C31 64 35 52 38 46 h24 C65 52 69 64 71 77 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Crown Ermine Collar -->
+          <path d="M26 46 h48 c0 -4 -3 -6 -8 -6 H34 c-5 0 -8 2 -8 6 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}"/>
+          <!-- Imperial Crown Arches -->
+          <path d="M27 40 C28 24 38 21 50 21 C62 21 72 24 73 40 Z" fill="${bodyGrad}" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+          <!-- Crown Rib Arch Lines -->
+          <path d="M50 21 L50 40 M38 23 C42 30 43 35 44 40 M62 23 C58 30 57 35 56 40" fill="none" stroke="${strokeColor}" stroke-width="1.8"/>
+          <!-- Ornate Imperial Maltese Cross Pattée on Top -->
+          <path d="M48 6 h4 v14 h-4 Z M43 10 h14 v4 h-14 Z" fill="${goldFill}" stroke="${strokeColor}" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="50" cy="12" r="2.2" fill="#ffffff" stroke="${strokeColor}" stroke-width="1"/>
+          <!-- Royal Mantle Highlight -->
+          <path d="M33 74 C35 64 38 54 40 48" fill="none" stroke="${rimStroke}" stroke-width="2.2" stroke-linecap="round"/>
+        </g>
+      `;
+
+    default:
+      return '';
+  }
 }
+
+export function getPieceSVG(type, color) {
+  const normalizedType = type.toLowerCase();
+  const defs = DEFS_CACHE[color] || DEFS_CACHE.w;
+  const graphics = renderPieceGraphics(normalizedType, color);
+  const key = `${color}_${normalizedType}`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" class="chess-piece" data-piece="${key}">${defs}${graphics}</svg>`;
+}
+

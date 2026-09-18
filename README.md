@@ -14,8 +14,11 @@ A high-performance, mobile-first, offline-capable Progressive Web App (PWA) ches
 - **Full Draw & End-Game Detection**: Checkmate, Stalemate, Threefold Repetition (via 64-bit BigInt Zobrist Hashing), Fifty-Move Rule, and Insufficient Material (K vs K, K+N vs K, K+B vs K, and K+B vs K+B on same-colored squares).
 - **Mobile-First & App-Ready**: Built from the ground up for touch devices with CSS Grid, fluid `clamp()` sizing, `aspect-ratio: 1 / 1`, safe-area insets, and `>= 44x44px` touch targets.
 - **Dual Input Modes**: Seamlessly switch between tap-to-select / tap-to-move and drag-and-drop on any device.
-- **Synthesized Audio Engine**: Procedural sound effects generated natively in-browser via the Web Audio API (move, capture, check, castle, game over) with zero external audio assets required.
+- **Luxury Handcrafted Vector Pieces**: Custom-sculpted Staunton chess piece SVGs (Knight/Stallion, King with Maltese cross, Queen coronet, Cathedral Bishop, Stone Rook fortress, Pawn) with multi-stop linear gradients, drop shadows, and gold jewel embellishments.
+- **Tournament Aesthetics & Glassmorphic UI**: Authentic warm maple & walnut board styling (`#f0d9b5` / `#b58863`) bordered by mahogany bevels, glowing turn indicators, tactile piece hover/grab elevations, and typography powered by *Cinzel* and *Plus Jakarta Sans*.
+- **Spectacular Victory Celebrations**: Full-screen 60fps canvas confetti and fireworks particle engine tailored for checkmate triumphs on both desktop and mobile screens.
 - **Intelligent AI Opponent**: Play against a chess engine powered by Minimax with Alpha-Beta Pruning, Piece-Square Tables (PST), Quiescence search, and 3 selectable difficulty levels (Easy, Medium, Hard). Supports playing as White or Black, or switching to 2-Player Pass & Play mode.
+- **Synthesized Audio Engine**: Procedural sound effects generated natively in-browser via the Web Audio API (move, capture, check, castle, game over) with zero external audio assets required.
 - **PWA & Offline First**: Cache-first Service Worker and Web App Manifest allow instant installation on iOS, Android, and Desktop with full offline playability.
 - **App-Conversion Ready**: Zero browser-specific window calls, making it instantly wrap-ready into native Android and iOS apps with Capacitor or Cordova.
 

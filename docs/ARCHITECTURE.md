@@ -153,3 +153,15 @@ The AI engine uses an optimized game-tree search pipeline tailored for client-si
    - **Easy**: Blended random sampling with basic capture heuristics.
    - **Medium**: Depth 2 tree search with full positional evaluation.
    - **Hard**: Depth 3-4 tree search with alpha-beta pruning and tactical quiescence.
+
+---
+
+## 7. Victory Celebration & Particle Physics (`confetti.js`)
+
+Upon checkmate or resignation, the UI triggers a multi-phase celebration:
+1. **Dual-Cannon Fireworks**: Left and right angled particle cannons fire colorful ribbon and star projectiles with initial velocities, air drag (`0.985`), and gravity (`0.28`).
+2. **Radial Starbursts**: Center-screen firework explosions emit sparkling geometric stars and circular particles.
+3. **3D Flutter Simulation**: Ribbons oscillate along their vertical axis (`scaleY = Math.cos(wobble)`), simulating true 3D fluttering without WebGL overhead.
+4. **Hardware Adaptation**: Canvas automatically scales with `window.devicePixelRatio` (capped at 2.0 for mobile thermal safety). Particle densities adapt dynamically (90 particles on mobile vs 160 on desktop).
+5. **Harmonic Fanfare**: Procedural Web Audio brass fanfare arpeggio (`C4 -> E4 -> G4 -> C5`) supported by a sustained major third shimmer chord.
+6. **Battery & Memory Safe**: Event loop terminates cleanly after the 4-second cascade or immediately upon dialog dismissal, releasing memory and frame requests.

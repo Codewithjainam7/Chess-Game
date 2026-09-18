@@ -759,6 +759,16 @@ html, body {
   pointer-events: auto;
 }
 
+/* Victory Canvas overlay */
+.victory-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 105;
+}
+
 .modal-card {
   background: var(--bg-secondary);
   border: 1px solid var(--bg-tertiary);
@@ -768,12 +778,141 @@ html, body {
   width: 100%;
   box-shadow: var(--shadow-lg);
   text-align: center;
-  transform: translateY(20px);
+  transform: translateY(20px) scale(0.95);
   transition: transform var(--transition-normal);
 }
 
 .modal-backdrop.open .modal-card {
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
+  animation: modalPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes modalPop {
+  0% { transform: scale(0.7) translateY(30px); opacity: 0; }
+  70% { transform: scale(1.04) translateY(-3px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* Victory Card Polish & Glassmorphism */
+.victory-card {
+  position: relative;
+  z-index: 110;
+  background: rgba(30, 41, 59, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(251, 191, 36, 0.35);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 45px rgba(251, 191, 36, 0.22);
+}
+
+[data-theme="light"] .victory-card {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 35px rgba(245, 158, 11, 0.25);
+}
+
+/* Trophy & Aura Animations */
+.victory-trophy-wrap {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 4px 0 16px;
+}
+
+.trophy-ray-glow {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.5) 0%, rgba(245, 158, 11, 0.18) 45%, transparent 70%);
+  animation: goldPulse 2.2s infinite ease-in-out;
+  pointer-events: none;
+}
+
+.trophy-icon {
+  font-size: clamp(3.2rem, 12vw, 4.4rem);
+  line-height: 1;
+  filter: drop-shadow(0 10px 22px rgba(251, 191, 36, 0.65));
+  animation: trophyFloat 2.4s infinite ease-in-out;
+  user-select: none;
+  z-index: 2;
+}
+
+.victory-banner-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  background: linear-gradient(135deg, #f59e0b, #eab308, #fbbf24);
+  color: #0f172a;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.45);
+  margin-top: 8px;
+  z-index: 2;
+}
+
+.victory-banner-badge.draw {
+  background: linear-gradient(135deg, #64748b, #94a3b8);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.4);
+}
+
+@keyframes trophyFloat {
+  0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+  50% { transform: translateY(-8px) scale(1.08) rotate(3deg); }
+}
+
+@keyframes goldPulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.5; }
+  50% { transform: scale(1.35); opacity: 0.95; }
+}
+
+/* Match Stats Pills */
+.victory-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px 0 20px;
+  flex-wrap: wrap;
+}
+
+.victory-stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] .victory-stat-pill {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: #f1f5f9;
+}
+
+.stat-pill-icon {
+  font-size: 0.95rem;
+}
+
+.btn-victory-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+}
+
+.btn-victory-primary:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
 }
 
 .modal-title {
@@ -785,7 +924,7 @@ html, body {
 .modal-description {
   font-size: 0.95rem;
   color: var(--text-secondary);
-  margin-bottom: 20px;
+  margin-bottom: 8px;
 }
 
 /* Promotion Modal Specifics */

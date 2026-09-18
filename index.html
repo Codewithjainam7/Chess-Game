@@ -189,13 +189,33 @@
       </div>
     </div>
 
-    <!-- Game Over Modal -->
+    <!-- Game Over Victory Modal -->
     <div id="game-over-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="game-over-title">
-      <div class="modal-card">
+      <div class="modal-card victory-card">
+        <div class="victory-trophy-wrap">
+          <div class="trophy-ray-glow"></div>
+          <div id="game-over-trophy" class="trophy-icon">🏆</div>
+          <span id="game-over-badge" class="victory-banner-badge">VICTORY</span>
+        </div>
         <h2 id="game-over-title" class="modal-title">Checkmate!</h2>
         <p id="game-over-desc" class="modal-description">White wins against Black.</p>
+
+        <div class="victory-stats-row">
+          <div class="victory-stat-pill">
+            <span class="stat-pill-icon">♟️</span>
+            <span id="game-over-moves-stat">0 Moves</span>
+          </div>
+          <div class="victory-stat-pill">
+            <span class="stat-pill-icon">🎖️</span>
+            <span id="game-over-reason-stat">Checkmate</span>
+          </div>
+        </div>
+
         <div class="modal-actions">
-          <button id="btn-game-over-new" class="btn btn-primary">Play Again</button>
+          <button id="btn-game-over-new" class="btn btn-primary btn-victory-primary">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Play Again</span>
+          </button>
           <button id="btn-game-over-close" class="btn">View Board</button>
         </div>
       </div>

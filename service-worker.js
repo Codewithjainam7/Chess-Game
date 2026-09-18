@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chess-game-v3';
+const CACHE_NAME = 'chess-game-v4';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ const PRECACHE_ASSETS = [
   './src/js/notation.js',
   './src/js/zobrist.js',
   './src/js/ai.js',
+  './src/js/confetti.js',
   './src/js/ui.js',
   './src/js/main.js',
   './src/assets/icons/icon-192.png',

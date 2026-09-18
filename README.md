@@ -55,7 +55,9 @@ The codebase is organized into focused, modular ES modules with single responsib
 │       ├── gameState.js        # Game loop, turn management, draw conditions, history
 │       ├── notation.js         # FEN parse/export, SAN formatting, PGN generation
 │       ├── zobrist.js          # Deterministic 64-bit Zobrist position hashing
-│       ├── ui.js               # Board rendering, dual drag/tap input, Web Audio, modals
+│       ├── ai.js               # Minimax/Negamax AI engine with Alpha-Beta pruning & PST
+│       ├── confetti.js         # High-performance 60fps Canvas confetti & fireworks engine
+│       ├── ui.js               # Board rendering, dual drag/tap input, Web Audio, victory modal
 │       └── main.js             # Bootstrap, lifecycle wiring, Service Worker registration
 ├── tests/
 │   ├── perft.test.js           # Perft move generation correctness tests

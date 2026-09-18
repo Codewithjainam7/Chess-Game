@@ -24,6 +24,7 @@ import {
 } from './pieces.js';
 import { moveToSAN, generatePGN, toFEN } from './notation.js';
 import { getAIMove } from './ai.js';
+import { VictoryCelebration } from './confetti.js';
 
 // Procedural Web Audio Sound Generator
 class SoundManager {
@@ -141,6 +142,50 @@ class SoundManager {
       osc.stop(this.ctx.currentTime + 0.55 + idx * 0.08);
     });
   }
+
+  playVictoryFanfare() {
+    if (!this.enabled) return;
+    this._initCtx();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    // Upbeat celebratory brass fanfare: C4 -> E4 -> G4 -> C5
+    const fanfare = [
+      { freq: 261.63, delay: 0, dur: 0.13 },    // C4
+      { freq: 329.63, delay: 0.12, dur: 0.13 }, // E4
+      { freq: 392.00, delay: 0.24, dur: 0.14 }, // G4
+      { freq: 523.25, delay: 0.38, dur: 0.75 }  // C5 (triumphant climax)
+    ];
+
+    fanfare.forEach(({ freq, delay, dur }) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + delay);
+      gain.gain.setValueAtTime(0.3, now + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + dur);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now + delay);
+      osc.stop(now + delay + dur);
+    });
+
+    // Backing major shimmer harmony (E5 + G5)
+    [659.25, 783.99].forEach((freq) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + 0.38);
+      gain.gain.setValueAtTime(0.18, now + 0.38);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38 + 0.7);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now + 0.38);
+      osc.stop(now + 1.15);
+    });
+  }
 }
 
 export class ChessUI {
@@ -177,7 +222,14 @@ export class ChessUI {
     this.gameOverModalEl = document.getElementById('game-over-modal');
     this.gameOverTitleEl = document.getElementById('game-over-title');
     this.gameOverDescEl = document.getElementById('game-over-desc');
+    this.gameOverTrophyEl = document.getElementById('game-over-trophy');
+    this.gameOverBadgeEl = document.getElementById('game-over-badge');
+    this.gameOverMovesStatEl = document.getElementById('game-over-moves-stat');
+    this.gameOverReasonStatEl = document.getElementById('game-over-reason-stat');
     this.toastEl = document.getElementById('toast');
+
+    // Victory & Confetti Celebration Engine
+    this.celebration = new VictoryCelebration();
 
     // Buttons
     this.btnUndo = document.getElementById('btn-undo');
@@ -575,16 +627,56 @@ export class ChessUI {
 
   showGameOverModal() {
     const status = this.game.getGameStatus();
-    this.gameOverTitleEl.textContent = status.title;
-    this.gameOverDescEl.textContent = status.description;
+    const isDraw = !status.winner;
+
+    if (this.gameOverTrophyEl) {
+      this.gameOverTrophyEl.textContent = isDraw ? '🤝' : '🏆';
+    }
+    if (this.gameOverBadgeEl) {
+      this.gameOverBadgeEl.textContent = isDraw ? 'DRAW' : 'VICTORY';
+      this.gameOverBadgeEl.className = `victory-banner-badge ${isDraw ? 'draw' : ''}`;
+    }
+    if (this.gameOverTitleEl) {
+      this.gameOverTitleEl.textContent = status.title;
+    }
+    if (this.gameOverDescEl) {
+      this.gameOverDescEl.textContent = status.description;
+    }
+    if (this.gameOverMovesStatEl) {
+      const fullMoves = Math.floor((this.game.moveHistory.length + 1) / 2);
+      this.gameOverMovesStatEl.textContent = `${fullMoves} ${fullMoves === 1 ? 'Move' : 'Moves'}`;
+    }
+    if (this.gameOverReasonStatEl) {
+      const reasonMap = {
+        checkmate: 'Checkmate',
+        resignation: 'Resignation',
+        stalemate: 'Stalemate',
+        threefold_repetition: 'Repetition',
+        fifty_move_rule: '50-Move Rule',
+        insufficient_material: 'Insufficient Pieces'
+      };
+      this.gameOverReasonStatEl.textContent = reasonMap[status.reason] || 'Game Over';
+    }
+
     this.gameOverModalEl.classList.add('open');
+
+    // Launch spectacular full-screen confetti & fireworks celebration
+    this.celebration.start({ isWinner: !isDraw });
+
+    if (!isDraw) {
+      this.sounds.playVictoryFanfare();
+    } else {
+      this.sounds.playGameOver();
+    }
   }
 
   closeGameOverModal() {
     this.gameOverModalEl.classList.remove('open');
+    this.celebration.stop();
   }
 
   handleUndo() {
+    this.celebration.stop();
     const undone = this.game.undoMove();
     if (undone) {
       this.clearSelection();
@@ -608,6 +700,7 @@ export class ChessUI {
   }
 
   handleNewGame() {
+    this.celebration.stop();
     this.game.loadFEN();
     this.clearSelection();
     this.render();

@@ -270,11 +270,18 @@ html, body {
 }
 
 .brand-crest {
-  font-size: 1.8rem;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #38bdf8;
   filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.7));
   animation: crestGlow 3s infinite ease-in-out;
+}
+
+.brand-crest svg {
+  width: 26px;
+  height: 26px;
+  display: block;
 }
 
 @keyframes crestGlow {
@@ -406,28 +413,33 @@ html, body {
 }
 
 .player-avatar {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: var(--border-radius-pill);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: 800;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   transition: transform var(--transition-fast);
+  overflow: hidden;
+  padding: 3px;
+}
+
+.player-avatar svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
 }
 
 .player-avatar.white {
   background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
-  color: #0f172a;
   border: 2px solid rgba(255, 255, 255, 0.9);
   box-shadow: 0 0 16px rgba(255, 255, 255, 0.5), inset 0 1px 2px rgba(255, 255, 255, 1);
 }
 
 .player-avatar.black {
   background: linear-gradient(135deg, #334155 0%, #090d16 100%);
-  color: #f8fafc;
   border: 2px solid rgba(148, 163, 184, 0.45);
   box-shadow: 0 0 16px rgba(15, 23, 42, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.2);
 }
@@ -794,6 +806,10 @@ html, body {
 
 .mode-btn {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   border: none;
   border-radius: var(--border-radius-pill);
   background: transparent;
@@ -804,6 +820,11 @@ html, body {
   font-weight: 700;
   cursor: pointer;
   transition: all var(--transition-fast);
+}
+
+.mode-btn svg {
+  flex-shrink: 0;
+  display: block;
 }
 
 .mode-btn:hover {
@@ -841,6 +862,9 @@ html, body {
 }
 
 .pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border: 1px solid var(--glass-border);
   background: var(--glass-surface);
   backdrop-filter: blur(12px);
@@ -854,6 +878,11 @@ html, body {
   cursor: pointer;
   box-shadow: var(--glass-specular);
   transition: all var(--transition-fast);
+}
+
+.pill-btn svg {
+  flex-shrink: 0;
+  display: block;
 }
 
 .pill-btn:hover {
@@ -1131,12 +1160,18 @@ html, body {
 }
 
 .trophy-icon {
-  font-size: clamp(3.4rem, 12vw, 4.6rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
-  filter: drop-shadow(0 10px 24px rgba(251, 191, 36, 0.75));
-  animation: trophyFloat 2.4s infinite ease-in-out;
   user-select: none;
   z-index: 2;
+}
+
+.trophy-svg-vector {
+  filter: drop-shadow(0 10px 24px rgba(251, 191, 36, 0.75));
+  animation: trophyFloat 2.4s infinite ease-in-out;
+  display: block;
 }
 
 .victory-banner-badge {
@@ -1182,7 +1217,7 @@ html, body {
 .victory-stat-pill {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   padding: 7px 16px;
   background: var(--glass-surface);
   border: 1px solid var(--glass-border);
@@ -1191,6 +1226,17 @@ html, body {
   font-weight: 700;
   color: var(--text-primary);
   box-shadow: var(--glass-specular);
+}
+
+.stat-pill-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #38bdf8;
+}
+
+.stat-pill-icon svg {
+  display: block;
 }
 
 .btn-victory-primary {

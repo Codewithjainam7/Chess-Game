@@ -630,7 +630,34 @@ export class ChessUI {
     const isDraw = !status.winner;
 
     if (this.gameOverTrophyEl) {
-      this.gameOverTrophyEl.textContent = isDraw ? '🤝' : '🏆';
+      this.gameOverTrophyEl.innerHTML = isDraw ? `
+        <svg viewBox="0 0 64 64" width="72" height="72" fill="none" class="trophy-svg-vector">
+          <defs>
+            <linearGradient id="draw-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#94a3b8"/>
+              <stop offset="100%" stop-color="#475569"/>
+            </linearGradient>
+          </defs>
+          <circle cx="32" cy="10" r="4" fill="#38bdf8"/>
+          <path d="M32 10v40M18 54h28M10 22l22-6 22 6" stroke="url(#draw-grad)" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M10 22l-6 14h12L10 22zM54 22l-6 14h12l-6-14z" fill="url(#draw-grad)" stroke="url(#draw-grad)" stroke-width="2.5" stroke-linejoin="round"/>
+        </svg>
+      ` : `
+        <svg viewBox="0 0 64 64" width="72" height="72" fill="none" class="trophy-svg-vector">
+          <defs>
+            <linearGradient id="trophy-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fef08a"/>
+              <stop offset="35%" stop-color="#fbbf24"/>
+              <stop offset="70%" stop-color="#f59e0b"/>
+              <stop offset="100%" stop-color="#b45309"/>
+            </linearGradient>
+          </defs>
+          <path d="M16 12h32v16c0 8.837-7.163 16-16 16s-16-7.163-16-16V12z" fill="url(#trophy-grad)"/>
+          <path d="M16 16H9a4 4 0 0 0-4 4v3a9 9 0 0 0 9 9h2M48 16h7a4 4 0 0 1 4 4v3a9 9 0 0 1-9 9h-2" stroke="url(#trophy-grad)" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M28 44h8v8h-8zM20 52h24v4a2 2 0 0 1-2 2H22a2 2 0 0 1-2-2v-4z" fill="url(#trophy-grad)"/>
+          <path d="M32 18l2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.5 5-.7z" fill="#ffffff" opacity="0.95"/>
+        </svg>
+      `;
     }
     if (this.gameOverBadgeEl) {
       this.gameOverBadgeEl.textContent = isDraw ? 'DRAW' : 'VICTORY';
@@ -869,13 +896,13 @@ export class ChessUI {
 
     // Top player bar
     this.topPlayerAvatar.className = `player-avatar ${topColor === WHITE ? 'white' : 'black'}`;
-    this.topPlayerAvatar.textContent = topColor === WHITE ? '♔' : '♚';
+    this.topPlayerAvatar.innerHTML = getPieceSVG(KING, topColor);
     this.topPlayerName.textContent = topName;
     this.topTurnPill.className = `turn-pill ${this.game.turn === topColor && !this.game.isGameOver() ? 'active' : ''}`;
 
     // Bottom player bar
     this.bottomPlayerAvatar.className = `player-avatar ${bottomColor === WHITE ? 'white' : 'black'}`;
-    this.bottomPlayerAvatar.textContent = bottomColor === WHITE ? '♔' : '♚';
+    this.bottomPlayerAvatar.innerHTML = getPieceSVG(KING, bottomColor);
     this.bottomPlayerName.textContent = bottomName;
     this.bottomTurnPill.className = `turn-pill ${this.game.turn === bottomColor && !this.game.isGameOver() ? 'active' : ''}`;
 

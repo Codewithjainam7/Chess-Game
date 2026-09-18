@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chess-game-v6-liquid-glass';
+const CACHE_NAME = 'chess-game-v7-vector-icons';
 const PRECACHE_ASSETS = [
   './',
   './index.html',

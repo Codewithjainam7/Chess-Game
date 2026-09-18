@@ -2,7 +2,7 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 
-const PORT = 3000;
+const PORT = process.env.PORT || 5173;
 const MIME_TYPES = {
   '.html': 'text/html',
   '.css': 'text/css',

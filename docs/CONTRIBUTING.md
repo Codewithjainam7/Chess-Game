@@ -24,10 +24,10 @@ npm install
 Start the zero-dependency local dev server:
 ```bash
 npm start
-# Server starts at http://localhost:3000/
+# Server starts at http://localhost:5173/
 ```
 
-Alternatively, open `index.html` via any static HTTP server (e.g., Python's `python -m http.server 3000` or VS Code Live Server).
+Alternatively, open `index.html` via any static HTTP server (e.g., Python's `python -m http.server 5173` or VS Code Live Server).
 
 ---
 

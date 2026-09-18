@@ -1,0 +1,14 @@
+{
+  "name": "chess-game-pwa",
+  "version": "1.0.0",
+  "description": "Mobile-first, app-conversion-ready PWA chess game built with vanilla JavaScript",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "lint": "node scripts/lint.js",
+    "start": "npx -y serve . -l 3000"
+  },
+  "keywords": ["chess", "pwa", "mobile-first", "vanilla-js"],
+  "author": "",
+  "license": "MIT"
+}

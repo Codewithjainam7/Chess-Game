@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="description" content="Mobile-first, offline-ready 2-player chess game with 100% correct FIDE rules.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Chess">
+  <title>Grandmaster Chess — Mobile PWA</title>
+
+  <!-- PWA Manifest & Icons -->
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./src/assets/icons/icon.svg">
+  <link rel="apple-touch-icon" href="./src/assets/icons/icon-192.png">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./src/css/styles.css">
+  <link rel="stylesheet" href="./src/css/responsive.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Navigation Header -->
+    <header class="app-header">
+      <div class="brand">
+        <img src="./src/assets/icons/icon.svg" alt="Chess Logo" class="brand-icon">
+        <h1 class="brand-title">Grandmaster Chess</h1>
+      </div>
+      <div class="header-actions">
+        <!-- Sound Mute/Unmute Toggle -->
+        <button id="btn-sound" class="icon-btn" aria-label="Toggle Sound" title="Sound Mute/Unmute">
+          <svg id="icon-sound-on" viewBox="0 0 24 24">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <svg id="icon-sound-off" viewBox="0 0 24 24" style="display: none;">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        </button>
+
+        <!-- Light / Dark Theme Toggle -->
+        <button id="btn-theme" class="icon-btn" aria-label="Toggle Theme" title="Toggle Light/Dark Theme">
+          <svg id="icon-sun" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-layout">
+      <!-- Game Container (Player Bar + Chess Board + Player Bar) -->
+      <section class="game-container" aria-label="Chessboard and players">
+        <!-- Top Player Bar -->
+        <div id="top-player-bar" class="player-bar top">
+          <div class="player-info">
+            <div id="top-player-avatar" class="player-avatar black">B</div>
+            <span id="top-player-name" class="player-name">Black</span>
+            <span id="top-material-badge" class="material-badge">+0</span>
+          </div>
+          <div class="player-status">
+            <div id="top-captured-tray" class="captured-tray" aria-label="Captured pieces"></div>
+            <span id="top-turn-pill" class="turn-pill">Turn</span>
+          </div>
+        </div>
+
+        <!-- Board Grid Wrapper -->
+        <div class="board-wrapper" id="board-wrapper">
+          <div id="chess-board" class="chess-board" role="grid" aria-label="Interactive chess board">
+            <!-- 64 squares rendered dynamically by ui.js -->
+          </div>
+        </div>
+
+        <!-- Bottom Player Bar -->
+        <div id="bottom-player-bar" class="player-bar bottom">
+          <div class="player-info">
+            <div id="bottom-player-avatar" class="player-avatar white">W</div>
+            <span id="bottom-player-name" class="player-name">White</span>
+            <span id="bottom-material-badge" class="material-badge">+0</span>
+          </div>
+          <div class="player-status">
+            <div id="bottom-captured-tray" class="captured-tray" aria-label="Captured pieces"></div>
+            <span id="bottom-turn-pill" class="turn-pill active">Turn</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Side Control & History Panel -->
+      <aside class="side-panel" aria-label="Game controls and move history">
+        <!-- Game Status Card -->
+        <div class="status-card">
+          <div>
+            <div id="status-title" class="status-text">White to Move</div>
+            <div id="status-desc" class="status-subtext">Game in progress</div>
+          </div>
+        </div>
+
+        <!-- Move History Panel -->
+        <div class="history-container">
+          <div class="history-header">
+            <span>Move History (SAN)</span>
+            <span id="move-count-label">0 moves</span>
+          </div>
+          <div id="move-list" class="move-list" role="log" aria-live="polite">
+            <!-- SAN moves rendered here -->
+          </div>
+        </div>
+
+        <!-- Primary Action Controls -->
+        <div class="action-controls">
+          <button id="btn-undo" class="btn" title="Undo Move">
+            <svg viewBox="0 0 24 24"><path d="M3 7v6h6M3 13a9 9 0 1 1 2.64 6.36L3 17"></path></svg>
+            <span>Undo</span>
+          </button>
+          <button id="btn-redo" class="btn" title="Redo Move">
+            <svg viewBox="0 0 24 24"><path d="M21 7v6h-6M21 13a9 9 0 1 0-2.64 6.36L21 17"></path></svg>
+            <span>Redo</span>
+          </button>
+          <button id="btn-flip" class="btn" title="Flip Board">
+            <svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+            <span>Flip</span>
+          </button>
+          <button id="btn-new" class="btn btn-primary" title="Start New Game">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>New</span>
+          </button>
+        </div>
+
+        <!-- Secondary Controls -->
+        <div class="secondary-controls">
+          <button id="btn-resign" class="btn btn-danger" title="Resign Current Game">Resign</button>
+          <button id="btn-pgn" class="btn" title="Export PGN to Clipboard or File">Export PGN</button>
+          <button id="btn-fen" class="btn" title="Copy Current Position FEN">Copy FEN</button>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Touch-Friendly Pawn Promotion Modal -->
+    <div id="promotion-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="prom-title">
+      <div class="modal-card">
+        <h2 id="prom-title" class="modal-title">Promote Pawn</h2>
+        <p class="modal-description">Choose a piece for pawn promotion:</p>
+        <div class="promotion-grid">
+          <button class="promotion-piece-btn" data-piece="q" aria-label="Queen"></button>
+          <button class="promotion-piece-btn" data-piece="r" aria-label="Rook"></button>
+          <button class="promotion-piece-btn" data-piece="b" aria-label="Bishop"></button>
+          <button class="promotion-piece-btn" data-piece="n" aria-label="Knight"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="game-over-title">
+      <div class="modal-card">
+        <h2 id="game-over-title" class="modal-title">Checkmate!</h2>
+        <p id="game-over-desc" class="modal-description">White wins against Black.</p>
+        <div class="modal-actions">
+          <button id="btn-game-over-new" class="btn btn-primary">Play Again</button>
+          <button id="btn-game-over-close" class="btn">View Board</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification Banner -->
+    <div class="toast-container">
+      <div id="toast" class="toast">Action performed successfully</div>
+    </div>
+  </div>
+
+  <!-- Main ES Module Entry Point -->
+  <script type="module" src="./src/js/main.js"></script>
+</body>
+</html>

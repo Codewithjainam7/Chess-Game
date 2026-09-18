@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="pieceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <!-- Background rounded squircle -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle board pattern badge -->
+  <rect x="76" y="76" width="360" height="360" rx="40" fill="#334155" opacity="0.3"/>
+  <path d="M 76 256 H 436 M 256 76 V 436" stroke="#475569" stroke-width="4" opacity="0.2"/>
+
+  <!-- Chess Knight Figure -->
+  <g filter="url(#shadow)">
+    <!-- Base -->
+    <path d="M 146 384 C 146 368 180 360 256 360 C 332 360 366 368 366 384 L 380 412 C 382 418 376 424 370 424 L 142 424 C 136 424 130 418 132 412 Z" fill="url(#pieceGrad)"/>
+    <!-- Knight Body & Mane -->
+    <path d="M 170 360 C 170 310 190 265 205 240 C 190 240 162 230 152 210 C 142 190 148 165 168 152 C 178 145 198 140 216 142 C 220 120 236 96 265 88 C 285 82 305 88 316 102 C 330 120 332 142 334 165 C 348 182 362 205 362 236 C 362 290 342 335 342 360 Z" fill="url(#pieceGrad)"/>
+    <!-- Mane details / inner accents -->
+    <path d="M 270 120 C 255 135 248 160 248 185" stroke="#94a3b8" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <path d="M 292 145 C 280 165 276 195 278 220" stroke="#94a3b8" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <!-- Eye -->
+    <circle cx="204" cy="180" r="10" fill="#0f172a"/>
+    <circle cx="206" cy="178" r="3" fill="#ffffff"/>
+    <!-- Snout & Mouth Notch -->
+    <path d="M 152 210 C 165 214 185 212 195 204" stroke="#64748b" stroke-width="5" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

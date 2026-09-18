@@ -71,45 +71,57 @@ export function getOppositeColor(color) {
 const DEFS_CACHE = {
   w: `
     <defs>
+      <!-- Liquid Crystal White Gradient -->
       <linearGradient id="w-body-grad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#ffffff"/>
-        <stop offset="40%" stop-color="#f8fafc"/>
-        <stop offset="85%" stop-color="#e2e8f0"/>
+        <stop offset="30%" stop-color="#f8fafc"/>
+        <stop offset="70%" stop-color="#e2e8f0"/>
         <stop offset="100%" stop-color="#cbd5e1"/>
       </linearGradient>
+      <!-- Specular Liquid Highlight Flare -->
       <linearGradient id="w-specular" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
-        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.1"/>
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+        <stop offset="45%" stop-color="#ffffff" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.05"/>
       </linearGradient>
+      <!-- Prismatic Gold Jewel Accent -->
       <linearGradient id="gold-jewel" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#fef08a"/>
-        <stop offset="50%" stop-color="#f59e0b"/>
-        <stop offset="100%" stop-color="#b45309"/>
+        <stop offset="40%" stop-color="#fbbf24"/>
+        <stop offset="100%" stop-color="#d97706"/>
       </linearGradient>
-      <filter id="piece-shadow" x="-10%" y="-10%" width="130%" height="130%">
-        <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.25"/>
+      <!-- Soft Vitreous Caustic Shadow -->
+      <filter id="piece-shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="2.5" flood-color="#0f172a" flood-opacity="0.32"/>
+        <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#38bdf8" flood-opacity="0.2"/>
       </filter>
     </defs>
   `,
   b: `
     <defs>
+      <!-- Smoked Obsidian Vitreous Gradient -->
       <linearGradient id="b-body-grad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#475569"/>
-        <stop offset="35%" stop-color="#334155"/>
+        <stop offset="30%" stop-color="#334155"/>
         <stop offset="75%" stop-color="#1e293b"/>
-        <stop offset="100%" stop-color="#0f172a"/>
+        <stop offset="100%" stop-color="#090d16"/>
       </linearGradient>
+      <!-- Neon Liquid Rim Light -->
       <linearGradient id="b-rim-glow" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#94a3b8" stop-opacity="0.6"/>
-        <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.2"/>
+        <stop offset="0%" stop-color="#c084fc" stop-opacity="0.75"/>
+        <stop offset="50%" stop-color="#818cf8" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.25"/>
       </linearGradient>
+      <!-- Imperial Obsidian Jewel Accent -->
       <linearGradient id="gold-jewel-dark" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#fef08a"/>
-        <stop offset="60%" stop-color="#f59e0b"/>
-        <stop offset="100%" stop-color="#78350f"/>
+        <stop offset="50%" stop-color="#f59e0b"/>
+        <stop offset="100%" stop-color="#92400e"/>
       </linearGradient>
-      <filter id="piece-shadow-dark" x="-10%" y="-10%" width="130%" height="130%">
-        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.45"/>
+      <!-- Liquid Deep Shadow with Sub-surface Violet Glow -->
+      <filter id="piece-shadow-dark" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.55"/>
+        <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#8b5cf6" flood-opacity="0.25"/>
       </filter>
     </defs>
   `

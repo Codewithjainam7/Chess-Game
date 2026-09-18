@@ -20,6 +20,17 @@ A high-performance, mobile-first, offline-capable Progressive Web App (PWA) ches
 
 ---
 
+## 📚 Deep-Dive Documentation
+
+For detailed technical specifications and guides, consult the dedicated documentation in `/docs`:
+
+- **[System Architecture & Design Patterns](docs/ARCHITECTURE.md)**: Component dependency diagrams, engine decoupling rationale, two-tier move pipeline, state lifecycle, and procedural Web Audio synthesis mechanics.
+- **[FIDE Rules, Edge Cases & Verification Reference](docs/RULES_AND_EDGE_CASES.md)**: Castling validation invariants, the en passant horizontal rank-pin proof, threefold repetition hashing, and official Perft test results.
+- **[Native Mobile App Conversion Guide](docs/NATIVE_APP_WRAPPER_GUIDE.md)**: Step-by-step Capacitor setup, iOS Xcode configuration, Android Studio APK/AAB signing, and WebView performance rules.
+- **[Contributing Guidelines](docs/CONTRIBUTING.md)**: Development setup, local testing instructions, code style, and test suite requirements.
+
+---
+
 ## 🏗️ Architecture Overview
 
 The codebase is organized into focused, modular ES modules with single responsibilities:

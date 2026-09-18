@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chess-game-v1';
+const CACHE_NAME = 'chess-game-v3';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const PRECACHE_ASSETS = [
   './src/js/gameState.js',
   './src/js/notation.js',
   './src/js/zobrist.js',
+  './src/js/ai.js',
   './src/js/ui.js',
   './src/js/main.js',
   './src/assets/icons/icon-192.png',
@@ -43,13 +44,10 @@ self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
+  // Network-first strategy for live updates with seamless offline fallback
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        // Cache valid responses
+    fetch(event.request)
+      .then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -57,12 +55,15 @@ self.addEventListener('fetch', (event) => {
           });
         }
         return networkResponse;
-      }).catch(() => {
-        // Fallback to offline root if navigating
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-      });
-    })
+      })
+      .catch(() => {
+        // Fallback to cache when offline
+        return caches.match(event.request).then((cached) => {
+          if (cached) return cached;
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+        });
+      })
   );
 });

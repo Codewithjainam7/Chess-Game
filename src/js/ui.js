@@ -186,6 +186,8 @@ export class ChessUI {
     this.btnNew = document.getElementById('btn-new');
     this.btnResign = document.getElementById('btn-resign');
     this.btnPgn = document.getElementById('btn-pgn');
+    this.btnFen = document.getElementById('btn-fen');
+    this.btnSound = document.getElementById('btn-sound');
     this.btnTheme = document.getElementById('btn-theme');
 
     // AI & Game Mode Configuration
@@ -195,7 +197,7 @@ export class ChessUI {
     this.isAIThinking = false;
     this.aiThinkingBadge = document.getElementById('ai-thinking-badge');
 
-    // Drag state
+    // Drag & interaction state
     this.dragState = {
       isDragging: false,
       fromSquare: null,
@@ -203,6 +205,7 @@ export class ChessUI {
       startY: 0,
       ghostEl: null
     };
+    this._lastPointerDownTime = 0;
 
     this.pendingPromotionMove = null;
 
@@ -232,6 +235,7 @@ export class ChessUI {
   _initSoundUI() {
     const onIcon = document.getElementById('icon-sound-on');
     const offIcon = document.getElementById('icon-sound-off');
+    if (!onIcon || !offIcon) return;
     if (this.sounds.enabled) {
       onIcon.style.display = 'block';
       offIcon.style.display = 'none';
@@ -248,15 +252,15 @@ export class ChessUI {
   }
 
   _bindControls() {
-    this.btnUndo.addEventListener('click', () => this.handleUndo());
-    this.btnRedo.addEventListener('click', () => this.handleRedo());
-    this.btnFlip.addEventListener('click', () => this.handleFlip());
-    this.btnNew.addEventListener('click', () => this.handleNewGame());
-    this.btnResign.addEventListener('click', () => this.handleResign());
-    this.btnPgn.addEventListener('click', () => this.handleExportPGN());
-    this.btnFen.addEventListener('click', () => this.handleCopyFEN());
-    this.btnSound.addEventListener('click', () => this._toggleSound());
-    this.btnTheme.addEventListener('click', () => this._toggleTheme());
+    this.btnUndo?.addEventListener('click', () => this.handleUndo());
+    this.btnRedo?.addEventListener('click', () => this.handleRedo());
+    this.btnFlip?.addEventListener('click', () => this.handleFlip());
+    this.btnNew?.addEventListener('click', () => this.handleNewGame());
+    this.btnResign?.addEventListener('click', () => this.handleResign());
+    this.btnPgn?.addEventListener('click', () => this.handleExportPGN());
+    this.btnFen?.addEventListener('click', () => this.handleCopyFEN());
+    this.btnSound?.addEventListener('click', () => this._toggleSound());
+    this.btnTheme?.addEventListener('click', () => this._toggleTheme());
 
     // Game Over modal buttons
     document.getElementById('btn-game-over-new')?.addEventListener('click', () => {
@@ -304,9 +308,18 @@ export class ChessUI {
     window.addEventListener('pointermove', (e) => this._onPointerMove(e));
     window.addEventListener('pointerup', (e) => this._onPointerUp(e));
     window.addEventListener('pointercancel', (e) => this._onPointerCancel(e));
+    // Click fallback for engines/browsers with suppressed pointerdown
+    this.boardEl.addEventListener('click', (e) => this._onClick(e));
   }
 
-  _getSquareFromPoint(clientX, clientY) {
+  _getSquareFromPoint(clientX, clientY, target = null) {
+    if (target && typeof target.closest === 'function') {
+      const squareEl = target.closest('.square');
+      if (squareEl) {
+        const sq = parseInt(squareEl.getAttribute('data-square'), 10);
+        if (!isNaN(sq)) return sq;
+      }
+    }
     const el = document.elementFromPoint(clientX, clientY);
     if (!el) return null;
     const squareEl = el.closest('.square');
@@ -315,13 +328,19 @@ export class ChessUI {
     return isNaN(sq) ? null : sq;
   }
 
+  _onClick(e) {
+    if (Date.now() - (this._lastPointerDownTime || 0) < 350) return;
+    this._onPointerDown(e);
+  }
+
   _onPointerDown(e) {
     if (this.game.isGameOver()) return;
     if (this.isAIThinking) return;
     if (this.gameMode === 'ai' && this.game.turn !== this.playerColor) return;
-    if (e.button !== 0) return; // Only primary mouse button or touch
+    if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
 
-    const square = this._getSquareFromPoint(e.clientX, e.clientY);
+    this._lastPointerDownTime = Date.now();
+    const square = this._getSquareFromPoint(e.clientX, e.clientY, e.target);
     if (square === null) return;
 
     const piece = this.game.board[square];
@@ -332,8 +351,12 @@ export class ChessUI {
       return;
     }
 
-    // Case 2: Pressed on own piece -> Start drag & select
+    // Case 2: Pressed on own piece -> Start drag & select (or toggle deselect)
     if (piece && piece.color === this.game.turn) {
+      if (this.selectedSquare === square) {
+        this.clearSelection();
+        return;
+      }
       this.dragState.isDragging = false; // will become true on move threshold
       this.dragState.fromSquare = square;
       this.dragState.startX = e.clientX;

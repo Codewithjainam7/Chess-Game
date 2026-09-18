@@ -104,6 +104,50 @@ export class VictoryCelebration {
     this._animate();
   }
 
+  startDefeat() {
+    this.stop();
+    this._initCanvas();
+    this.isRunning = true;
+    this.particles = [];
+
+    const isMobile = window.innerWidth < 768;
+    const defeatPalette = ['#f43f5e', '#e11d48', '#be123c', '#881337', '#475569', '#334155'];
+
+    // Falling ember / spark rain
+    const emberInterval = setInterval(() => {
+      if (!this.isRunning) {
+        clearInterval(emberInterval);
+        return;
+      }
+      for (let i = 0; i < (isMobile ? 3 : 6); i++) {
+        this.particles.push({
+          x: Math.random() * this.width,
+          y: -10,
+          vx: (Math.random() - 0.5) * 1.8,
+          vy: Math.random() * 2.2 + 1.4,
+          size: Math.random() * 5 + 3,
+          color: defeatPalette[Math.floor(Math.random() * defeatPalette.length)],
+          type: 'circle',
+          rotation: 0,
+          rotSpeed: 0,
+          wobble: Math.random() * Math.PI * 2,
+          wobbleSpeed: 0.05,
+          gravity: 0.08,
+          drag: 0.99,
+          opacity: 0.85,
+          fadeSpeed: 0.0035,
+          scaleY: 1
+        });
+      }
+    }, 140);
+
+    setTimeout(() => {
+      clearInterval(emberInterval);
+    }, 4000);
+
+    this._animate();
+  }
+
   _fireCannon(x, y, baseAngleDeg, count, palette, minSpeed = 12, maxSpeed = 24) {
     const baseAngleRad = (baseAngleDeg * Math.PI) / 180;
     const spreadRad = (45 * Math.PI) / 180;

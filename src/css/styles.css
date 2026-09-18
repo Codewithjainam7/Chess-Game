@@ -981,6 +981,8 @@ html, body {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
+  width: 100%;
+  margin-top: 10px;
 }
 
 .btn {
@@ -1134,10 +1136,39 @@ html, body {
   box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.85), 0 0 50px rgba(251, 191, 36, 0.25), var(--glass-specular);
 }
 
+/* Defeat Card — Crimson Obsidian Glow */
+.defeat-card {
+  position: relative;
+  z-index: 110;
+  border: 1.5px solid rgba(244, 63, 94, 0.55);
+  box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.9), 0 0 50px rgba(244, 63, 94, 0.3), var(--glass-specular);
+  background: rgba(26, 15, 23, 0.92);
+}
+
+/* Draw Card — Sleek Sapphire Slate Glow */
+.draw-card {
+  position: relative;
+  z-index: 110;
+  border: 1.5px solid rgba(148, 163, 184, 0.45);
+  box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.85), 0 0 40px rgba(148, 163, 184, 0.2), var(--glass-specular);
+}
+
 [data-theme="light"] .victory-card {
   background: rgba(255, 255, 255, 0.9);
   border-color: rgba(245, 158, 11, 0.5);
   box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.25), 0 0 40px rgba(245, 158, 11, 0.3);
+}
+
+[data-theme="light"] .defeat-card {
+  background: rgba(255, 241, 242, 0.92);
+  border-color: rgba(244, 63, 94, 0.5);
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.25), 0 0 40px rgba(244, 63, 94, 0.25);
+}
+
+[data-theme="light"] .draw-card {
+  background: rgba(248, 250, 252, 0.92);
+  border-color: rgba(148, 163, 184, 0.5);
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.2), 0 0 30px rgba(148, 163, 184, 0.2);
 }
 
 .victory-trophy-wrap {
@@ -1159,6 +1190,14 @@ html, body {
   pointer-events: none;
 }
 
+.defeat-card .trophy-ray-glow {
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.5) 0%, rgba(225, 29, 72, 0.18) 50%, transparent 70%);
+}
+
+.draw-card .trophy-ray-glow {
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(148, 163, 184, 0.15) 50%, transparent 70%);
+}
+
 .trophy-icon {
   display: flex;
   align-items: center;
@@ -1170,6 +1209,12 @@ html, body {
 
 .trophy-svg-vector {
   filter: drop-shadow(0 10px 24px rgba(251, 191, 36, 0.75));
+  animation: trophyFloat 2.4s infinite ease-in-out;
+  display: block;
+}
+
+.defeat-svg-vector {
+  filter: drop-shadow(0 10px 24px rgba(244, 63, 94, 0.8));
   animation: trophyFloat 2.4s infinite ease-in-out;
   display: block;
 }
@@ -1189,10 +1234,28 @@ html, body {
   z-index: 2;
 }
 
+.victory-banner-badge.defeat {
+  background: linear-gradient(135deg, #f43f5e, #dc2626, #991b1b);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(225, 29, 72, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
 .victory-banner-badge.draw {
   background: linear-gradient(135deg, #64748b, #94a3b8);
   color: #ffffff;
   box-shadow: 0 4px 14px rgba(100, 116, 139, 0.45);
+}
+
+.victory-banner-badge.white-win {
+  background: linear-gradient(135deg, #ffffff, #e0e7ff, #38bdf8);
+  color: #0f172a;
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.6);
+}
+
+.victory-banner-badge.black-win {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1, #0f172a);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.6);
 }
 
 @keyframes trophyFloat {

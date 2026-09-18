@@ -186,6 +186,60 @@ class SoundManager {
       osc.stop(now + 1.15);
     });
   }
+
+  playDefeatSound() {
+    if (!this.enabled) return;
+    this._initCtx();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    // Somber descending minor sequence: G3 -> Eb3 -> C3 -> G2
+    const sequence = [
+      { freq: 196.00, delay: 0, dur: 0.22 },     // G3
+      { freq: 155.56, delay: 0.20, dur: 0.24 },  // Eb3
+      { freq: 130.81, delay: 0.42, dur: 0.28 },  // C3
+      { freq: 98.00, delay: 0.68, dur: 0.95 }    // G2 (deep somber tone)
+    ];
+
+    sequence.forEach(({ freq, delay, dur }) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, now + delay);
+      gain.gain.setValueAtTime(0.22, now + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + dur);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now + delay);
+      osc.stop(now + delay + dur);
+    });
+  }
+
+  playDrawSound() {
+    if (!this.enabled) return;
+    this._initCtx();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    // Balanced peaceful two-tone chime (A3 -> D4)
+    [
+      { freq: 220.00, delay: 0, dur: 0.4 },
+      { freq: 293.66, delay: 0.2, dur: 0.6 }
+    ].forEach(({ freq, delay, dur }) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + delay);
+      gain.gain.setValueAtTime(0.25, now + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + dur);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now + delay);
+      osc.stop(now + delay + dur);
+    });
+  }
 }
 
 export class ChessUI {
@@ -557,12 +611,42 @@ export class ChessUI {
     }
   }
 
-  triggerAIMove() {
+  async triggerAIMove() {
     this.isAIThinking = true;
     if (this.aiThinkingBadge) this.aiThinkingBadge.style.display = 'flex';
     this.renderStatus();
 
-    // Natural delay so human sees their move finish before AI answers
+    const currentFen = toFEN(this.game);
+    const difficulty = this.aiDifficulty || 'medium';
+
+    try {
+      const response = await fetch('/api/ai-move', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fen: currentFen, difficulty })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.move) {
+          const fromSq = squareFromCoords(data.move.from);
+          const toSq = squareFromCoords(data.move.to);
+          const prom = data.move.promotion ? data.move.promotion.toLowerCase() : QUEEN;
+
+          this.isAIThinking = false;
+          if (this.aiThinkingBadge) this.aiThinkingBadge.style.display = 'none';
+
+          if (!this.game.isGameOver()) {
+            this.executeMove(fromSq, toSq, prom);
+          }
+          return;
+        }
+      }
+    } catch (err) {
+      // Python backend offline or standalone client usage; proceed to client AI fallback
+    }
+
+    // Client-side fallback (offline PWA)
     setTimeout(() => {
       if (this.game.isGameOver()) {
         this.isAIThinking = false;
@@ -577,7 +661,7 @@ export class ChessUI {
       if (aiMove) {
         this.executeMove(aiMove.from, aiMove.to, aiMove.promotion || QUEEN);
       }
-    }, 280);
+    }, 260);
   }
 
   setGameMode(mode) {
@@ -628,73 +712,160 @@ export class ChessUI {
   showGameOverModal() {
     const status = this.game.getGameStatus();
     const isDraw = !status.winner;
+    const isAIMode = this.gameMode === 'ai';
 
-    if (this.gameOverTrophyEl) {
-      this.gameOverTrophyEl.innerHTML = isDraw ? `
-        <svg viewBox="0 0 64 64" width="72" height="72" fill="none" class="trophy-svg-vector">
-          <defs>
-            <linearGradient id="draw-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#94a3b8"/>
-              <stop offset="100%" stop-color="#475569"/>
-            </linearGradient>
-          </defs>
-          <circle cx="32" cy="10" r="4" fill="#38bdf8"/>
-          <path d="M32 10v40M18 54h28M10 22l22-6 22 6" stroke="url(#draw-grad)" stroke-width="3.5" stroke-linecap="round"/>
-          <path d="M10 22l-6 14h12L10 22zM54 22l-6 14h12l-6-14z" fill="url(#draw-grad)" stroke="url(#draw-grad)" stroke-width="2.5" stroke-linejoin="round"/>
-        </svg>
-      ` : `
-        <svg viewBox="0 0 64 64" width="72" height="72" fill="none" class="trophy-svg-vector">
-          <defs>
-            <linearGradient id="trophy-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#fef08a"/>
-              <stop offset="35%" stop-color="#fbbf24"/>
-              <stop offset="70%" stop-color="#f59e0b"/>
-              <stop offset="100%" stop-color="#b45309"/>
-            </linearGradient>
-          </defs>
-          <path d="M16 12h32v16c0 8.837-7.163 16-16 16s-16-7.163-16-16V12z" fill="url(#trophy-grad)"/>
-          <path d="M16 16H9a4 4 0 0 0-4 4v3a9 9 0 0 0 9 9h2M48 16h7a4 4 0 0 1 4 4v3a9 9 0 0 1-9 9h-2" stroke="url(#trophy-grad)" stroke-width="3.5" stroke-linecap="round"/>
-          <path d="M28 44h8v8h-8zM20 52h24v4a2 2 0 0 1-2 2H22a2 2 0 0 1-2-2v-4z" fill="url(#trophy-grad)"/>
-          <path d="M32 18l2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.5 5-.7z" fill="#ffffff" opacity="0.95"/>
-        </svg>
-      `;
+    const card = this.gameOverModalEl.querySelector('.modal-card');
+    card.classList.remove('victory-card', 'defeat-card', 'draw-card');
+
+    let badgeText = 'VICTORY';
+    let badgeClass = 'victory-banner-badge';
+    let titleText = status.title;
+    let descText = status.description;
+
+    const reasonMap = {
+      checkmate: 'Checkmate',
+      resignation: 'Resignation',
+      stalemate: 'Stalemate',
+      threefold_repetition: 'Threefold Repetition',
+      fifty_move_rule: '50-Move Rule',
+      insufficient_material: 'Insufficient Material'
+    };
+    const friendlyReason = reasonMap[status.reason] || 'Game Over';
+
+    if (isDraw) {
+      card.classList.add('draw-card');
+      badgeText = 'DRAW';
+      badgeClass = 'victory-banner-badge draw';
+      titleText = 'Game Drawn';
+      descText = `The match concluded peacefully in a draw by ${friendlyReason}.`;
+
+      if (this.gameOverTrophyEl) {
+        this.gameOverTrophyEl.innerHTML = `
+          <svg viewBox="0 0 64 64" width="72" height="72" fill="none" class="trophy-svg-vector">
+            <defs>
+              <linearGradient id="draw-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#94a3b8"/>
+                <stop offset="100%" stop-color="#475569"/>
+              </linearGradient>
+            </defs>
+            <circle cx="32" cy="10" r="4" fill="#38bdf8"/>
+            <path d="M32 10v40M18 54h28M10 22l22-6 22 6" stroke="url(#draw-grad)" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M10 22l-6 14h12L10 22zM54 22l-6 14h12l-6-14z" fill="url(#draw-grad)" stroke="url(#draw-grad)" stroke-width="2.5" stroke-linejoin="round"/>
+          </svg>
+        `;
+      }
+
+      this.celebration.stop();
+      this.sounds.playDrawSound();
+    } else if (isAIMode) {
+      const userWon = status.winner === this.playerColor;
+
+      if (userWon) {
+        card.classList.add('victory-card');
+        badgeText = 'VICTORY';
+        badgeClass = 'victory-banner-badge victory';
+        titleText = 'Triumphant Victory!';
+        descText = `Outstanding game! You defeated the Computer on ${this.aiDifficulty.toUpperCase()} level by ${friendlyReason}!`;
+
+        if (this.gameOverTrophyEl) {
+          this.gameOverTrophyEl.innerHTML = `
+            <svg viewBox="0 0 64 64" width="72" height="72" fill="none" class="trophy-svg-vector">
+              <defs>
+                <linearGradient id="trophy-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#fef08a"/>
+                  <stop offset="35%" stop-color="#fbbf24"/>
+                  <stop offset="70%" stop-color="#f59e0b"/>
+                  <stop offset="100%" stop-color="#b45309"/>
+                </linearGradient>
+              </defs>
+              <path d="M16 12h32v16c0 8.837-7.163 16-16 16s-16-7.163-16-16V12z" fill="url(#trophy-grad)"/>
+              <path d="M16 16H9a4 4 0 0 0-4 4v3a9 9 0 0 0 9 9h2M48 16h7a4 4 0 0 1 4 4v3a9 9 0 0 1-9 9h-2" stroke="url(#trophy-grad)" stroke-width="3.5" stroke-linecap="round"/>
+              <path d="M28 44h8v8h-8zM20 52h24v4a2 2 0 0 1-2 2H22a2 2 0 0 1-2-2v-4z" fill="url(#trophy-grad)"/>
+              <path d="M32 18l2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.5 5-.7z" fill="#ffffff" opacity="0.95"/>
+            </svg>
+          `;
+        }
+
+        this.celebration.start({ isWinner: true });
+        this.sounds.playVictoryFanfare();
+      } else {
+        card.classList.add('defeat-card');
+        badgeText = 'DEFEAT';
+        badgeClass = 'victory-banner-badge defeat';
+        titleText = 'Defeat';
+        descText = `The Computer checkmated your King by ${friendlyReason}. Review your positions and launch a rematch!`;
+
+        if (this.gameOverTrophyEl) {
+          this.gameOverTrophyEl.innerHTML = `
+            <svg viewBox="0 0 64 64" width="72" height="72" fill="none" class="defeat-svg-vector">
+              <defs>
+                <linearGradient id="defeat-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#f43f5e"/>
+                  <stop offset="60%" stop-color="#e11d48"/>
+                  <stop offset="100%" stop-color="#881337"/>
+                </linearGradient>
+              </defs>
+              <path d="M32 6L10 16v18c0 14 10 22 22 26 12-4 22-12 22-26V16L32 6z" fill="url(#defeat-grad)" opacity="0.25"/>
+              <path d="M32 6L10 16v18c0 14 10 22 22 26 12-4 22-12 22-26V16L32 6z" stroke="url(#defeat-grad)" stroke-width="3"/>
+              <path d="M32 14l-6 14h8l-6 16" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          `;
+        }
+
+        this.celebration.startDefeat();
+        this.sounds.playDefeatSound();
+      }
+    } else {
+      // 2-Player Local Mode
+      const winnerName = status.winner === WHITE ? 'White' : 'Black';
+      const loserName = status.winner === WHITE ? 'Black' : 'White';
+      card.classList.add('victory-card');
+      badgeText = `${winnerName.toUpperCase()} WINS`;
+      badgeClass = `victory-banner-badge ${status.winner === WHITE ? 'white-win' : 'black-win'}`;
+      titleText = `${winnerName} is Victorious!`;
+      descText = `${winnerName} won the match! ${loserName} has been defeated by ${friendlyReason}.`;
+
+      if (this.gameOverTrophyEl) {
+        this.gameOverTrophyEl.innerHTML = `
+          <svg viewBox="0 0 64 64" width="72" height="72" fill="none" class="trophy-svg-vector">
+            <defs>
+              <linearGradient id="champ-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fef08a"/>
+                <stop offset="40%" stop-color="#38bdf8"/>
+                <stop offset="100%" stop-color="#818cf8"/>
+              </linearGradient>
+            </defs>
+            <path d="M16 12h32v16c0 8.837-7.163 16-16 16s-16-7.163-16-16V12z" fill="url(#champ-grad)"/>
+            <path d="M16 16H9a4 4 0 0 0-4 4v3a9 9 0 0 0 9 9h2M48 16h7a4 4 0 0 1 4 4v3a9 9 0 0 1-9 9h-2" stroke="url(#champ-grad)" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M28 44h8v8h-8zM20 52h24v4a2 2 0 0 1-2 2H22a2 2 0 0 1-2-2v-4z" fill="url(#champ-grad)"/>
+            <path d="M32 18l2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.5 5-.7z" fill="#ffffff" opacity="0.95"/>
+          </svg>
+        `;
+      }
+
+      this.celebration.start({ isWinner: true });
+      this.sounds.playVictoryFanfare();
     }
+
     if (this.gameOverBadgeEl) {
-      this.gameOverBadgeEl.textContent = isDraw ? 'DRAW' : 'VICTORY';
-      this.gameOverBadgeEl.className = `victory-banner-badge ${isDraw ? 'draw' : ''}`;
+      this.gameOverBadgeEl.textContent = badgeText;
+      this.gameOverBadgeEl.className = badgeClass;
     }
     if (this.gameOverTitleEl) {
-      this.gameOverTitleEl.textContent = status.title;
+      this.gameOverTitleEl.textContent = titleText;
     }
     if (this.gameOverDescEl) {
-      this.gameOverDescEl.textContent = status.description;
+      this.gameOverDescEl.textContent = descText;
     }
     if (this.gameOverMovesStatEl) {
       const fullMoves = Math.floor((this.game.moveHistory.length + 1) / 2);
       this.gameOverMovesStatEl.textContent = `${fullMoves} ${fullMoves === 1 ? 'Move' : 'Moves'}`;
     }
     if (this.gameOverReasonStatEl) {
-      const reasonMap = {
-        checkmate: 'Checkmate',
-        resignation: 'Resignation',
-        stalemate: 'Stalemate',
-        threefold_repetition: 'Repetition',
-        fifty_move_rule: '50-Move Rule',
-        insufficient_material: 'Insufficient Pieces'
-      };
-      this.gameOverReasonStatEl.textContent = reasonMap[status.reason] || 'Game Over';
+      this.gameOverReasonStatEl.textContent = friendlyReason;
     }
 
     this.gameOverModalEl.classList.add('open');
-
-    // Launch spectacular full-screen confetti & fireworks celebration
-    this.celebration.start({ isWinner: !isDraw });
-
-    if (!isDraw) {
-      this.sounds.playVictoryFanfare();
-    } else {
-      this.sounds.playGameOver();
-    }
   }
 
   closeGameOverModal() {

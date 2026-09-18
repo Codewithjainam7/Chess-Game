@@ -112,6 +112,26 @@
             <span id="bottom-turn-pill" class="turn-pill active">Turn</span>
           </div>
         </div>
+
+        <!-- Primary Action Controls (Directly below chessboard for flawless mobile reachability) -->
+        <div class="action-controls">
+          <button id="btn-undo" class="btn" title="Undo Move">
+            <svg viewBox="0 0 24 24"><path d="M3 7v6h6M3 13a9 9 0 1 1 2.64 6.36L3 17"></path></svg>
+            <span>Undo</span>
+          </button>
+          <button id="btn-redo" class="btn" title="Redo Move">
+            <svg viewBox="0 0 24 24"><path d="M21 7v6h-6M21 13a9 9 0 1 0-2.64 6.36L21 17"></path></svg>
+            <span>Redo</span>
+          </button>
+          <button id="btn-flip" class="btn" title="Flip Board">
+            <svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+            <span>Flip</span>
+          </button>
+          <button id="btn-new" class="btn btn-primary" title="Start New Game">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>New</span>
+          </button>
+        </div>
       </section>
 
       <!-- Side Control & History Panel -->
@@ -215,26 +235,6 @@
           <div id="move-list" class="move-list" role="log" aria-live="polite">
             <!-- SAN moves rendered here -->
           </div>
-        </div>
-
-        <!-- Primary Action Controls -->
-        <div class="action-controls">
-          <button id="btn-undo" class="btn" title="Undo Move">
-            <svg viewBox="0 0 24 24"><path d="M3 7v6h6M3 13a9 9 0 1 1 2.64 6.36L3 17"></path></svg>
-            <span>Undo</span>
-          </button>
-          <button id="btn-redo" class="btn" title="Redo Move">
-            <svg viewBox="0 0 24 24"><path d="M21 7v6h-6M21 13a9 9 0 1 0-2.64 6.36L21 17"></path></svg>
-            <span>Redo</span>
-          </button>
-          <button id="btn-flip" class="btn" title="Flip Board">
-            <svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
-            <span>Flip</span>
-          </button>
-          <button id="btn-new" class="btn btn-primary" title="Start New Game">
-            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>New</span>
-          </button>
         </div>
 
         <!-- Secondary Controls -->

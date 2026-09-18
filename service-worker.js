@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chess-game-v7-vector-icons';
+const CACHE_NAME = 'chess-game-v8-python-backend';
 const PRECACHE_ASSETS = [
   './',
   './index.html',

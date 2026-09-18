@@ -10,17 +10,55 @@ A high-performance, mobile-first, offline-capable Progressive Web App (PWA) ches
 ## 🌟 Key Highlights
 
 - **100% FIDE Rule Correctness**: Verified with official Perft tests (Start Position depths 1–4 and Kiwipete depths 1–3).
+- **Full Python Backend & REST Engine**: Powered by Flask and `python-chess` with Negamax search, Alpha-Beta pruning, Piece-Square Tables, Quiescence evaluation, and 3 difficulty tiers (`easy`, `medium`, `hard`).
+- **Hybrid AI Architecture**: Seamlessly queries the Python backend REST API (`/api/ai-move`), with instantaneous fallback to client-side JS engine if playing offline.
 - **Special Moves Fully Implemented**: Castling (with check/through-check/blocker validation), En Passant (with 1-turn expiry and rank pin detection), and Pawn Promotion (interactive modal with Queen, Rook, Bishop, Knight choices).
 - **Full Draw & End-Game Detection**: Checkmate, Stalemate, Threefold Repetition (via 64-bit BigInt Zobrist Hashing), Fifty-Move Rule, and Insufficient Material (K vs K, K+N vs K, K+B vs K, and K+B vs K+B on same-colored squares).
-- **Mobile-First & App-Ready**: Built from the ground up for touch devices with CSS Grid, fluid `clamp()` sizing, `aspect-ratio: 1 / 1`, safe-area insets, and `>= 44x44px` touch targets.
+- **Dedicated Victory, Defeat & 2-Player Screens**:
+  - **Defeat Mode (vs AI)**: Somber descending minor arpeggio chime, falling charcoal/crimson ember particles, and broken sword banner when human is checkmated by the computer.
+  - **Victory Mode (vs AI)**: Triumphant fanfare, gold trophy, and full-screen 60fps canvas fireworks when human defeats the computer.
+  - **2-Player Local Mode**: Explicitly displays both the victor and the defeated party with color-coded banners (e.g., *"White is Victorious! Black has been defeated"*).
+  - **Draw / Stalemate**: Neutral balance scales of justice and peaceful two-tone chime.
+- **Ultra Mobile Ergonomic Layout**: Action buttons (`Undo`, `Redo`, `Flip`, `New Game`) are docked directly below the board for single-thumb reach. Dynamic viewport-aware scaling (`calc(100dvh - 220px)`) guarantees the board, players, and controls fit above the fold with zero scrolling.
+- **iOS 27 Liquid Glass Aesthetic & Zero Emojis**: High-end vector SVG icons everywhere, frosted backdrop-filter blurs, spec-highlight borders, and responsive touch feedback.
 - **Dual Input Modes**: Seamlessly switch between tap-to-select / tap-to-move and drag-and-drop on any device.
-- **Luxury Handcrafted Vector Pieces**: Custom-sculpted Staunton chess piece SVGs (Knight/Stallion, King with Maltese cross, Queen coronet, Cathedral Bishop, Stone Rook fortress, Pawn) with multi-stop linear gradients, drop shadows, and gold jewel embellishments.
-- **Tournament Aesthetics & Glassmorphic UI**: Authentic warm maple & walnut board styling (`#f0d9b5` / `#b58863`) bordered by mahogany bevels, glowing turn indicators, tactile piece hover/grab elevations, and typography powered by *Cinzel* and *Plus Jakarta Sans*.
-- **Spectacular Victory Celebrations**: Full-screen 60fps canvas confetti and fireworks particle engine tailored for checkmate triumphs on both desktop and mobile screens.
-- **Intelligent AI Opponent**: Play against a chess engine powered by Minimax with Alpha-Beta Pruning, Piece-Square Tables (PST), Quiescence search, and 3 selectable difficulty levels (Easy, Medium, Hard). Supports playing as White or Black, or switching to 2-Player Pass & Play mode.
-- **Synthesized Audio Engine**: Procedural sound effects generated natively in-browser via the Web Audio API (move, capture, check, castle, game over) with zero external audio assets required.
+- **Synthesized Audio Engine**: Procedural sound effects generated natively in-browser via the Web Audio API (move, capture, check, castle, victory fanfare, defeat arpeggio, draw chime).
 - **PWA & Offline First**: Cache-first Service Worker and Web App Manifest allow instant installation on iOS, Android, and Desktop with full offline playability.
-- **App-Conversion Ready**: Zero browser-specific window calls, making it instantly wrap-ready into native Android and iOS apps with Capacitor or Cordova.
+
+---
+
+## 🚀 Quickstart & Running Locally
+
+### 1. Requirements
+- Python 3.10+ (Recommended for full backend engine)
+- Node.js 18+ (Optional for fallback server and JS test runner)
+
+### 2. Python Backend Server (Default & Recommended)
+```bash
+# 1. Install dependencies
+pip install -r backend/requirements.txt
+
+# 2. Start the unified server on port 5173
+python server.py
+# Or via npm:
+npm start
+
+# 3. Open in your browser
+http://localhost:5173/
+```
+
+### 3. Running Test Suites
+```bash
+# Run Python backend unit and integration tests (8/8 tests)
+python tests/test_backend.py
+# Or: npm run test:py
+
+# Run JavaScript Perft, rule, and AI tests (38/38 tests)
+npm test
+
+# Run syntax linter across all JS files
+npm run lint
+```
 
 ---
 
@@ -41,6 +79,12 @@ The codebase is organized into focused, modular ES modules with single responsib
 
 ```
 /
+├── backend/
+│   ├── app.py                  # Flask REST API server and static asset host
+│   ├── chess_engine.py         # python-chess Negamax AI engine with PST & Alpha-Beta
+│   ├── game_service.py         # Game rules, legal moves, validation, PGN export
+│   └── requirements.txt        # Python backend dependencies (flask, python-chess)
+├── server.py                   # Root Python server entrypoint (runs on port 5173)
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml              # Automated lint and Perft/Rules test suite
@@ -58,17 +102,19 @@ The codebase is organized into focused, modular ES modules with single responsib
 │       ├── gameState.js        # Game loop, turn management, draw conditions, history
 │       ├── notation.js         # FEN parse/export, SAN formatting, PGN generation
 │       ├── zobrist.js          # Deterministic 64-bit Zobrist position hashing
-│       ├── ai.js               # Minimax/Negamax AI engine with Alpha-Beta pruning & PST
-│       ├── confetti.js         # High-performance 60fps Canvas confetti & fireworks engine
-│       ├── ui.js               # Board rendering, dual drag/tap input, Web Audio, victory modal
+│       ├── ai.js               # Client fallback Minimax engine with Alpha-Beta pruning & PST
+│       ├── confetti.js         # High-performance 60fps Canvas confetti, fireworks & ember engine
+│       ├── ui.js               # Board rendering, dual drag/tap input, Web Audio, victory/defeat modal
 │       └── main.js             # Bootstrap, lifecycle wiring, Service Worker registration
 ├── tests/
+│   ├── test_backend.py         # Python unit & integration tests (8/8 passing)
 │   ├── perft.test.js           # Perft move generation correctness tests
-│   └── rules.test.js           # Special rules, pins, double check, end-games, undo/redo
+│   ├── rules.test.js           # Special rules, pins, double check, end-games, undo/redo
+│   └── ai.test.js              # AI engine decision & mate-in-one tests
 ├── scripts/
 │   ├── generate-icons.js       # Standalone PNG generator for PWA assets
 │   ├── lint.js                 # Syntax validation script
-│   └── serve.js                # Zero-dependency local dev server
+│   └── serve.js                # Node fallback server
 ├── manifest.json               # Progressive Web App manifest
 ├── service-worker.js           # Cache-first offline service worker
 ├── index.html                  # Accessible app shell and dialog templates
@@ -118,6 +164,42 @@ Our engine passes all canonical test points:
   - Depth 1: `48`
   - Depth 2: `2,039`
   - Depth 3: `97,862`
+
+---
+
+## 🐍 Python Backend Engine & REST API
+
+The backend is built in Python using **Flask** and the standard **`python-chess`** library, providing a tournament-ready chess engine and REST microservice running on port `5173`.
+
+### 1. Engine Components
+- **`backend/chess_engine.py`**:
+  - **Evaluation Function**: Combines material valuations (`P:100, N:320, B:330, R:500, Q:900, K:20000`) with Piece-Square Tables (PST) favoring center control, king safety, and rapid piece development.
+  - **Negamax Search with Alpha-Beta Pruning**: Efficient adversarial minimax variant with recursive alpha-beta bounds.
+  - **Move Ordering**: Evaluates high-value captures first using MVV-LVA (Most Valuable Victim – Least Valuable Attacker) heuristic to trigger early beta-cutoffs.
+  - **Quiescence Search**: Extends search on capture sequences to eliminate the horizon effect and prevent tactical blunders.
+  - **3 Difficulty Levels**:
+    - `easy`: Depth 1 search with 25% tactical inaccuracy for beginner-friendly games.
+    - `medium`: Depth 2 search with positional heuristics.
+    - `hard`: Full depth 3+ search with Quiescence search and strict minimax evaluation.
+- **`backend/game_service.py`**:
+  - FEN serialization and validation.
+  - Legal move generation and square attack checking.
+  - Game status determination (checkmate, stalemate, insufficient material, 50-move rule, threefold repetition).
+  - PGN export generator with event headers and move history.
+- **`backend/app.py`**:
+  - Flask application with threaded request handling and CORS support.
+  - Serves static assets (`index.html`, CSS, JS, manifest, PWA icons) and provides REST endpoints.
+
+### 2. REST API Endpoints
+
+| Method | Endpoint | Description | Request Payload | Response |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/api/health` | Healthcheck & engine info | None | `{"status": "healthy", "engine": "Python-Chess AI"}` |
+| `POST` | `/api/ai-move` | Calculate optimal AI move | `{"fen": "<FEN>", "difficulty": "medium"}` | `{"success": true, "move": {"uci": "e7e5", "from": "e7", "to": "e5", "san": "e5"}, "eval": 20, "nodes": 120}` |
+| `POST` | `/api/legal-moves` | Get all legal moves | `{"fen": "<FEN>", "square": "e2"}` | `{"success": true, "moves": [...]}` |
+| `POST` | `/api/validate-move` | Validate & apply a move | `{"fen": "<FEN>", "move": "e2e4"}` | `{"success": true, "valid": true, "fen": "<NEW_FEN>"}` |
+| `POST` | `/api/game-status` | Checkmate/draw status | `{"fen": "<FEN>"}` | `{"status": {"is_game_over": false, ...}}` |
+| `POST` | `/api/export-pgn` | Generate PGN string | `{"moves": ["e4", "e5", ...], "result": "1-0"}` | `{"success": true, "pgn": "..."}` |
 
 ---
 

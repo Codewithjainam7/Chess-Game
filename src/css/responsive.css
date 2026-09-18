@@ -1,19 +1,164 @@
 /* ==========================================================================
-   responsive.css — Responsive layout rules, breakpoints, and orientations
+   responsive.css — Mobile-First Responsive Breakpoints & Ergonomics
+   Grandmaster Chess PWA
    ========================================================================== */
 
-/* Mobile Small (< 380px) */
-@media (max-width: 380px) {
+/* Mobile Portrait (< 768px) */
+@media (max-width: 767px) {
+  .app-header {
+    padding: 8px 14px;
+  }
+
   .brand-title {
-    font-size: 1rem;
+    font-size: 1.15rem;
+  }
+
+  .brand-crest svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .main-layout {
+    padding: 8px 10px calc(20px + env(safe-area-inset-bottom, 0px));
+    gap: 10px;
+    width: 100%;
+  }
+
+  .game-container {
+    width: 100%;
+    /* Dynamically cap board size so the board, both player bars, and action controls fit without clipping */
+    max-width: min(94vw, calc(100dvh - 220px), 520px);
+  }
+
+  .player-bar {
+    padding: 6px 14px;
+    margin-bottom: 6px;
+    border-radius: var(--border-radius-pill);
+  }
+
+  .player-bar.bottom {
+    margin-top: 6px;
+    margin-bottom: 0;
+  }
+
+  .player-avatar {
+    width: 32px;
+    height: 32px;
   }
 
   .player-name {
-    font-size: 0.8rem;
+    font-size: 0.88rem;
   }
 
   .captured-tray {
-    max-width: 140px;
+    max-width: 150px;
+    min-height: 22px;
+  }
+
+  .captured-piece-mini {
+    width: 18px;
+    height: 18px;
+  }
+
+  .turn-pill {
+    font-size: 0.68rem;
+    padding: 4px 10px;
+  }
+
+  .action-controls {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .action-controls .btn {
+    min-height: 42px;
+    padding: 8px 6px;
+    font-size: 0.82rem;
+    gap: 4px;
+  }
+
+  .action-controls .btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .side-panel {
+    width: 100%;
+    max-width: min(94vw, calc(100dvh - 220px), 520px);
+    padding: 12px;
+    gap: 10px;
+    border-radius: var(--border-radius-lg);
+  }
+
+  .status-card {
+    padding: 8px 12px;
+  }
+
+  .status-text {
+    font-size: 0.95rem;
+  }
+
+  .mode-card {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .mode-btn {
+    padding: 7px 6px;
+    font-size: 0.78rem;
+    gap: 5px;
+  }
+
+  .setting-row {
+    font-size: 0.78rem;
+  }
+
+  .pill-btn {
+    padding: 5px 10px;
+    font-size: 0.74rem;
+  }
+
+  .history-container {
+    height: 105px;
+  }
+
+  .secondary-controls {
+    gap: 6px;
+  }
+
+  .secondary-controls .btn {
+    min-height: 40px;
+    padding: 6px 8px;
+    font-size: 0.78rem;
+    gap: 4px;
+  }
+
+  .secondary-controls .btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Very Small Mobile (< 380px) */
+@media (max-width: 380px) {
+  .brand-title {
+    font-size: 1.02rem;
+  }
+
+  .action-controls .btn {
+    padding: 6px 3px;
+    font-size: 0.75rem;
+  }
+
+  .action-controls .btn span {
+    font-size: 0.74rem;
+  }
+
+  .captured-tray {
+    max-width: 120px;
   }
 
   .captured-piece-mini {
@@ -21,34 +166,29 @@
     height: 15px;
   }
 
-  .btn {
-    padding: 6px 8px;
-    font-size: 0.8rem;
-  }
-
-  .action-controls {
-    gap: 4px;
+  .secondary-controls .btn span {
+    font-size: 0.72rem;
   }
 }
 
-/* Tablet & Desktop Layout (>= 768px) */
+/* Tablet & Desktop Side-by-Side (>= 768px) */
 @media (min-width: 768px) {
   .main-layout {
     flex-direction: row;
     align-items: flex-start;
     justify-content: center;
     padding: 24px 20px;
-    gap: 28px;
+    gap: 24px;
   }
 
   .game-container {
-    flex: 1.2;
-    max-width: 580px;
+    flex: 1.15;
+    max-width: 540px;
   }
 
   .side-panel {
     flex: 1;
-    max-width: 400px;
+    max-width: 420px;
     height: auto;
   }
 
@@ -63,7 +203,6 @@
   .player-avatar {
     width: 38px;
     height: 38px;
-    font-size: 14px;
   }
 
   .player-name {
@@ -76,14 +215,19 @@
   }
 }
 
-/* Desktop Large (>= 1024px) */
+/* Large Desktop Displays (>= 1024px) */
 @media (min-width: 1024px) {
+  .main-layout {
+    gap: 32px;
+    padding: 28px 24px;
+  }
+
   .game-container {
-    max-width: 640px;
+    max-width: 600px;
   }
 
   .side-panel {
-    max-width: 440px;
+    max-width: 450px;
   }
 
   .history-container {
@@ -91,58 +235,70 @@
   }
 }
 
-/* Short screens / Mobile Landscape */
-@media (max-height: 520px) and (orientation: landscape) {
+/* Landscape Mobile & Compact Height Devices (< 540px height) */
+@media (max-height: 540px) and (orientation: landscape) {
   .app-header {
-    display: none; /* Hide header to maximize board area in landscape */
+    display: none; /* Hide header to give maximum height to the chessboard */
   }
 
   .main-layout {
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 4px 16px;
+    padding: 4px 14px;
     gap: 16px;
     height: 100vh;
+    overflow: hidden;
   }
 
   .game-container {
     height: 96vh;
-    width: 96vh;
-    max-width: 96vh;
+    width: auto;
+    max-width: none;
     justify-content: center;
   }
 
   .board-wrapper {
-    height: 80vh;
-    width: 80vh;
+    height: 76vh;
+    width: 76vh;
+    max-width: 76vh;
   }
 
   .player-bar {
-    padding: 2px 8px;
+    padding: 2px 10px;
     margin: 2px 0;
+  }
+
+  .player-avatar {
+    width: 26px;
+    height: 26px;
+  }
+
+  .player-name {
+    font-size: 0.8rem;
+  }
+
+  .action-controls {
+    margin-top: 4px;
+    gap: 4px;
+  }
+
+  .action-controls .btn {
+    min-height: 32px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
   }
 
   .side-panel {
     max-height: 96vh;
     overflow-y: auto;
-    padding: 8px;
+    padding: 10px;
     gap: 8px;
     flex: 1;
+    max-width: 360px;
   }
 
   .history-container {
     height: 80px;
-  }
-
-  .action-controls {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 4px;
-  }
-
-  .btn {
-    min-height: 36px;
-    padding: 4px 6px;
-    font-size: 0.75rem;
   }
 }

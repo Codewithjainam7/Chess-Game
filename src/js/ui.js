@@ -23,6 +23,7 @@ import {
   getPieceSVG
 } from './pieces.js';
 import { moveToSAN, generatePGN, toFEN } from './notation.js';
+import { getAIMove } from './ai.js';
 
 // Procedural Web Audio Sound Generator
 class SoundManager {
@@ -185,9 +186,14 @@ export class ChessUI {
     this.btnNew = document.getElementById('btn-new');
     this.btnResign = document.getElementById('btn-resign');
     this.btnPgn = document.getElementById('btn-pgn');
-    this.btnFen = document.getElementById('btn-fen');
-    this.btnSound = document.getElementById('btn-sound');
     this.btnTheme = document.getElementById('btn-theme');
+
+    // AI & Game Mode Configuration
+    this.gameMode = 'ai'; // 'ai' or 'human'
+    this.aiDifficulty = 'medium'; // 'easy' | 'medium' | 'hard'
+    this.playerColor = WHITE; // Human's color when playing vs AI
+    this.isAIThinking = false;
+    this.aiThinkingBadge = document.getElementById('ai-thinking-badge');
 
     // Drag state
     this.dragState = {
@@ -268,6 +274,28 @@ export class ChessUI {
         this.selectPromotion(pieceType);
       });
     });
+
+    // Game Mode & AI Controls
+    document.getElementById('btn-mode-ai')?.addEventListener('click', () => this.setGameMode('ai'));
+    document.getElementById('btn-mode-human')?.addEventListener('click', () => this.setGameMode('human'));
+
+    document.querySelectorAll('.diff-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.diff-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.aiDifficulty = btn.getAttribute('data-diff') || 'medium';
+        this.showToast(`AI Difficulty: ${this.aiDifficulty.toUpperCase()}`);
+      });
+    });
+
+    document.querySelectorAll('.color-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.color-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        const chosenColor = btn.getAttribute('data-color') || WHITE;
+        this.setPlayerColor(chosenColor);
+      });
+    });
   }
 
   _bindBoardEvents() {
@@ -289,6 +317,8 @@ export class ChessUI {
 
   _onPointerDown(e) {
     if (this.game.isGameOver()) return;
+    if (this.isAIThinking) return;
+    if (this.gameMode === 'ai' && this.game.turn !== this.playerColor) return;
     if (e.button !== 0) return; // Only primary mouse button or touch
 
     const square = this._getSquareFromPoint(e.clientX, e.clientY);
@@ -406,7 +436,11 @@ export class ChessUI {
   }
 
   executeMove(from, to, promotion = null) {
-    const moves = this.availableMoves.filter((m) => m.from === from && m.to === to);
+    let moves = this.availableMoves.filter((m) => m.from === from && m.to === to);
+    if (moves.length === 0) {
+      // Programmatic / AI move: pull legal moves directly
+      moves = this.game.getLegalMoves(from).filter((m) => m.to === to);
+    }
     if (moves.length === 0) return;
 
     // Check if promotion is needed
@@ -439,10 +473,57 @@ export class ChessUI {
         this.sounds.playMove();
       }
 
-      // Check for Game Over modal
+      // Check for Game Over modal or trigger AI reply
       if (this.game.isGameOver()) {
         setTimeout(() => this.showGameOverModal(), 350);
+      } else if (this.gameMode === 'ai' && this.game.turn !== this.playerColor) {
+        this.triggerAIMove();
       }
+    }
+  }
+
+  triggerAIMove() {
+    this.isAIThinking = true;
+    if (this.aiThinkingBadge) this.aiThinkingBadge.style.display = 'flex';
+    this.renderStatus();
+
+    // Natural delay so human sees their move finish before AI answers
+    setTimeout(() => {
+      if (this.game.isGameOver()) {
+        this.isAIThinking = false;
+        if (this.aiThinkingBadge) this.aiThinkingBadge.style.display = 'none';
+        return;
+      }
+
+      const aiMove = getAIMove(this.game, this.aiDifficulty);
+      this.isAIThinking = false;
+      if (this.aiThinkingBadge) this.aiThinkingBadge.style.display = 'none';
+
+      if (aiMove) {
+        this.executeMove(aiMove.from, aiMove.to, aiMove.promotion || QUEEN);
+      }
+    }, 280);
+  }
+
+  setGameMode(mode) {
+    this.gameMode = mode;
+    document.getElementById('btn-mode-ai')?.classList.toggle('active', mode === 'ai');
+    document.getElementById('btn-mode-human')?.classList.toggle('active', mode === 'human');
+    const settingsPanel = document.getElementById('ai-settings-panel');
+    if (settingsPanel) {
+      settingsPanel.style.display = mode === 'ai' ? 'flex' : 'none';
+    }
+    this.showToast(mode === 'ai' ? 'Mode: vs Computer' : 'Mode: 2 Player (Local)');
+    this.handleNewGame();
+  }
+
+  setPlayerColor(color) {
+    this.playerColor = color;
+    this.flipped = (color === BLACK);
+    this.handleNewGame();
+    this.showToast(`Playing as ${color === WHITE ? 'White' : 'Black'}`);
+    if (this.gameMode === 'ai' && color === BLACK) {
+      setTimeout(() => this.triggerAIMove(), 300);
     }
   }
 
@@ -655,16 +736,31 @@ export class ChessUI {
     const topColor = this.flipped ? WHITE : BLACK;
     const bottomColor = this.flipped ? BLACK : WHITE;
 
+    // Set player labels based on mode
+    let topName = topColor === WHITE ? 'White' : 'Black';
+    let bottomName = bottomColor === WHITE ? 'White' : 'Black';
+
+    if (this.gameMode === 'ai') {
+      const aiDiffLabel = this.aiDifficulty.charAt(0).toUpperCase() + this.aiDifficulty.slice(1);
+      if (this.playerColor === topColor) {
+        topName = `You (${topColor === WHITE ? 'White' : 'Black'})`;
+        bottomName = `Computer (${aiDiffLabel})`;
+      } else {
+        bottomName = `You (${bottomColor === WHITE ? 'White' : 'Black'})`;
+        topName = `Computer (${aiDiffLabel})`;
+      }
+    }
+
     // Top player bar
     this.topPlayerAvatar.className = `player-avatar ${topColor === WHITE ? 'white' : 'black'}`;
     this.topPlayerAvatar.textContent = topColor === WHITE ? 'W' : 'B';
-    this.topPlayerName.textContent = topColor === WHITE ? 'White' : 'Black';
+    this.topPlayerName.textContent = topName;
     this.topTurnPill.className = `turn-pill ${this.game.turn === topColor && !this.game.isGameOver() ? 'active' : ''}`;
 
     // Bottom player bar
     this.bottomPlayerAvatar.className = `player-avatar ${bottomColor === WHITE ? 'white' : 'black'}`;
     this.bottomPlayerAvatar.textContent = bottomColor === WHITE ? 'W' : 'B';
-    this.bottomPlayerName.textContent = bottomColor === WHITE ? 'White' : 'Black';
+    this.bottomPlayerName.textContent = bottomName;
     this.bottomTurnPill.className = `turn-pill ${this.game.turn === bottomColor && !this.game.isGameOver() ? 'active' : ''}`;
 
     // Captured pieces trays

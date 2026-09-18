@@ -15,6 +15,7 @@ A high-performance, mobile-first, offline-capable Progressive Web App (PWA) ches
 - **Mobile-First & App-Ready**: Built from the ground up for touch devices with CSS Grid, fluid `clamp()` sizing, `aspect-ratio: 1 / 1`, safe-area insets, and `>= 44x44px` touch targets.
 - **Dual Input Modes**: Seamlessly switch between tap-to-select / tap-to-move and drag-and-drop on any device.
 - **Synthesized Audio Engine**: Procedural sound effects generated natively in-browser via the Web Audio API (move, capture, check, castle, game over) with zero external audio assets required.
+- **Intelligent AI Opponent**: Play against a chess engine powered by Minimax with Alpha-Beta Pruning, Piece-Square Tables (PST), Quiescence search, and 3 selectable difficulty levels (Easy, Medium, Hard). Supports playing as White or Black, or switching to 2-Player Pass & Play mode.
 - **PWA & Offline First**: Cache-first Service Worker and Web App Manifest allow instant installation on iOS, Android, and Desktop with full offline playability.
 - **App-Conversion Ready**: Zero browser-specific window calls, making it instantly wrap-ready into native Android and iOS apps with Capacitor or Cordova.
 

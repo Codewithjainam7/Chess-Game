@@ -135,3 +135,21 @@ Rather than relying on external `.mp3` or `.wav` files (which may fail to downlo
 - **Game Over**: Harmonic A-major chord (440 Hz, 554.37 Hz, 659.25 Hz).
 
 All sound calls are wrapped in an `enabled` check and respect mobile browser user-interaction policies (audio context initialization on first touch/click).
+
+---
+
+## 6. Chess AI Engine (`ai.js`)
+
+The AI engine uses an optimized game-tree search pipeline tailored for client-side JavaScript:
+
+1. **Negamax Search with Alpha-Beta Pruning**: Formulates minimax symmetrically using negamax where each node maximizes its relative advantage, reducing code branching and doubling search efficiency via alpha-beta cutoffs.
+2. **Piece-Square Tables (PST)**: Utilizes curated positional matrices for Pawns, Knights, Bishops, Rooks, Queens, and Kings:
+   - Central dominance (Knights/Pawns rewarded on `d4`, `e4`, `d5`, `e5`).
+   - King safety in middlegame corners (`g1`/`b1`).
+   - Active bishop diagonals and rook open files.
+3. **Quiescence Search**: Solves the tactical "horizon effect" by recursively searching captures and promotions until the board reaches a non-volatile "quiet" position.
+4. **Move Ordering (MVV-LVA)**: Sorts candidate moves prior to tree traversal, evaluating Most Valuable Victims taken by Least Valuable Attackers (e.g. `PxQ` evaluated before `QxP`), inducing rapid alpha-beta cutoffs.
+5. **Difficulty Scaling**:
+   - **Easy**: Blended random sampling with basic capture heuristics.
+   - **Medium**: Depth 2 tree search with full positional evaluation.
+   - **Hard**: Depth 3-4 tree search with alpha-beta pruning and tactical quiescence.

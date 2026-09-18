@@ -104,6 +104,35 @@
             <div id="status-title" class="status-text">White to Move</div>
             <div id="status-desc" class="status-subtext">Game in progress</div>
           </div>
+          <div id="ai-thinking-badge" class="ai-thinking-badge" style="display: none;">
+            <span class="ai-pulse"></span>
+            <span>Thinking...</span>
+          </div>
+        </div>
+
+        <!-- Game Mode & AI Difficulty Selector -->
+        <div class="mode-card">
+          <div class="mode-toggle-group">
+            <button id="btn-mode-ai" class="mode-btn active" data-mode="ai">🤖 vs Computer</button>
+            <button id="btn-mode-human" class="mode-btn" data-mode="human">👥 2-Player (Local)</button>
+          </div>
+          <div id="ai-settings-panel" class="ai-settings-panel">
+            <div class="setting-row">
+              <span class="setting-label">Difficulty:</span>
+              <div class="setting-pills">
+                <button class="pill-btn diff-btn" data-diff="easy">Easy</button>
+                <button class="pill-btn diff-btn active" data-diff="medium">Medium</button>
+                <button class="pill-btn diff-btn" data-diff="hard">Hard</button>
+              </div>
+            </div>
+            <div class="setting-row">
+              <span class="setting-label">Play as:</span>
+              <div class="setting-pills">
+                <button class="pill-btn color-btn active" data-color="w">White</button>
+                <button class="pill-btn color-btn" data-color="b">Black</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Move History Panel -->
